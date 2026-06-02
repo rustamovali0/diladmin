@@ -40,7 +40,6 @@
 
         .container { max-width: 1400px; margin: 0 auto; }
 
-        /* Header */
         .header {
             background: var(--card);
             border-radius: 20px;
@@ -56,7 +55,6 @@
         .header h1 { font-size: 1.8rem; color: var(--primary); }
         .header h1 i { margin-right: 10px; }
         
-        /* DB Status */
         .db-status {
             display: flex;
             align-items: center;
@@ -79,7 +77,6 @@
 
         .view-site { background: var(--primary); color: #1e2a36; padding: 10px 20px; border-radius: 40px; text-decoration: none; font-weight: bold; }
 
-        /* Tabs */
         .tabs {
             display: flex;
             flex-wrap: wrap;
@@ -325,10 +322,12 @@
 </div>
 
 <script>
+    // Supabase konfiqurasiyası - TƏK BİR DƏYİŞƏN
     const SUPABASE_URL = "https://icwpaipqqqwjpooazmcu.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_W5rnAxonO_Sq-EnCdlFU7Q_mkmi37yJ";
     
-    let supabase = null;
+    // Qlobal dəyişənlər - supabaseClient adı ilə (supabase deyil)
+    let supabaseClient = null;
     let levels = [];
     let categories = [];
     let words = [];
@@ -343,16 +342,9 @@
         const statusLed = document.getElementById('statusLed');
         const statusText = document.getElementById('statusText');
         
-        if (typeof supabase === 'undefined') {
-            statusLed.className = 'status-led disconnected';
-            statusText.innerHTML = '❌ Supabase yüklənmədi';
-            isConnected = false;
-            return;
-        }
-        
         try {
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            const { data, error } = await supabase.from('site_settings').select('id').limit(1);
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const { data, error } = await supabaseClient.from('site_settings').select('id').limit(1);
             if (!error) {
                 statusLed.className = 'status-led connected';
                 statusText.innerHTML = '✅ Bağlı';
@@ -382,8 +374,8 @@
 
     // ========== PARAMETRLƏR ==========
     async function loadSettings() {
-        if (!supabase) return;
-        const { data } = await supabase.from('site_settings').select('*').limit(1);
+        if (!supabaseClient) return;
+        const { data } = await supabaseClient.from('site_settings').select('*').limit(1);
         if (data && data[0]) {
             document.getElementById('siteName').value = data[0].site_name || '';
             document.getElementById('footerText').value = data[0].footer_text || '';
@@ -399,19 +391,19 @@
     }
 
     async function saveSettings() {
-        if (!supabase) { showAlert('Supabase bağlı deyil!', true); return; }
+        if (!supabaseClient) { showAlert('Supabase bağlı deyil!', true); return; }
         const site_name = document.getElementById('siteName').value;
         const footer_text = document.getElementById('footerText').value;
         const instagram_url = document.getElementById('instagramUrl').value;
         const tiktok_url = document.getElementById('tiktokUrl').value;
         const youtube_url = document.getElementById('youtubeUrl').value;
         
-        const { data: existing } = await supabase.from('site_settings').select('id').limit(1);
+        const { data: existing } = await supabaseClient.from('site_settings').select('id').limit(1);
         let result;
         if (existing && existing[0]) {
-            result = await supabase.from('site_settings').update({ site_name, footer_text, instagram_url, tiktok_url, youtube_url }).eq('id', existing[0].id);
+            result = await supabaseClient.from('site_settings').update({ site_name, footer_text, instagram_url, tiktok_url, youtube_url }).eq('id', existing[0].id);
         } else {
-            result = await supabase.from('site_settings').insert([{ site_name, footer_text, instagram_url, tiktok_url, youtube_url }]);
+            result = await supabaseClient.from('site_settings').insert([{ site_name, footer_text, instagram_url, tiktok_url, youtube_url }]);
         }
         if (!result.error) {
             showAlert('✅ Parametrlər yadda saxlandı!');
@@ -425,13 +417,13 @@
         const file = e.target.files[0];
         if (!file) return;
         const fileName = `logo_${Date.now()}.jpg`;
-        const { error } = await supabase.storage.from('logos').upload(fileName, file);
+        const { error } = await supabaseClient.storage.from('logos').upload(fileName, file);
         if (error) { showAlert('❌ Xəta: ' + error.message, true); return; }
-        const { data: existing } = await supabase.from('site_settings').select('id').limit(1);
+        const { data: existing } = await supabaseClient.from('site_settings').select('id').limit(1);
         if (existing && existing[0]) {
-            await supabase.from('site_settings').update({ logo_path: fileName }).eq('id', existing[0].id);
+            await supabaseClient.from('site_settings').update({ logo_path: fileName }).eq('id', existing[0].id);
         } else {
-            await supabase.from('site_settings').insert([{ logo_path: fileName }]);
+            await supabaseClient.from('site_settings').insert([{ logo_path: fileName }]);
         }
         loadSettings();
         showAlert('✅ Loqo yükləndi!');
@@ -439,25 +431,26 @@
 
     // ========== SƏVİYYƏLƏR ==========
     async function loadLevels() {
-        if (!supabase) return;
-        const { data } = await supabase.from('levels').select('*').order('display_order');
+        if (!supabaseClient) return;
+        const { data } = await supabaseClient.from('levels').select('*').order('display_order');
         levels = data || [];
         const container = document.getElementById('levelsList');
         if (levels.length === 0) { container.innerHTML = '<p>Heç bir səviyyə yoxdur</p>'; return; }
         container.innerHTML = `
             <table><thead><tr><th>ID</th><th>Ad</th><th>Sıra</th><th>Əməliyyat</th></tr></thead>
             <tbody>${levels.map(l => `<tr><td>${l.id}</td><td>${escape(l.name)}</td><td>${l.display_order || 0}</td>
-            <td class="action-icons"><i class="fas fa-edit" onclick="editLevel(${l.id}, '${escape(l.name)}', ${l.display_order || 0})"></i> <i class="fas fa-trash" onclick="deleteLevel(${l.id})"></i></td></tr>`).join('')}</tbody></table>
+            <td class="action-icons"><i class="fas fa-edit" onclick="editLevel(${l.id}, '${escape(l.name)}', ${l.display_order || 0})"></i> <i class="fas fa-trash" onclick="deleteLevel(${l.id})"></i></td></tr>`).join('')}</tbody>
+        </table>
         `;
         const select = document.getElementById('wordLevel');
         if (select) select.innerHTML = '<option value="">Seçin</option>' + levels.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
     }
 
     async function addLevel() {
-        if (!supabase) { showAlert('Supabase bağlı deyil!', true); return; }
+        if (!supabaseClient) { showAlert('Supabase bağlı deyil!', true); return; }
         const name = document.getElementById('newLevel').value.trim();
         if (!name) { showAlert('Səviyyə adı daxil edin!', true); return; }
-        const { error } = await supabase.from('levels').insert([{ name, display_order: levels.length + 1 }]);
+        const { error } = await supabaseClient.from('levels').insert([{ name, display_order: levels.length + 1 }]);
         if (!error) {
             document.getElementById('newLevel').value = '';
             loadLevels();
@@ -469,7 +462,7 @@
 
     async function deleteLevel(id) {
         if (!confirm('Silmək istədiyinizdən əminsiniz?')) return;
-        const { error } = await supabase.from('levels').delete().eq('id', id);
+        const { error } = await supabaseClient.from('levels').delete().eq('id', id);
         if (!error) {
             loadLevels();
             showAlert('✅ Səviyyə silindi!');
@@ -480,15 +473,16 @@
 
     // ========== KATEQORİYALAR ==========
     async function loadCategories() {
-        if (!supabase) return;
-        const { data } = await supabase.from('words').select('category').not('category', 'is', null);
+        if (!supabaseClient) return;
+        const { data } = await supabaseClient.from('words').select('category').not('category', 'is', null);
         const unique = [...new Set(data.map(w => w.category).filter(c => c))];
         categories = unique.sort();
         const container = document.getElementById('categoriesList');
         if (categories.length === 0) { container.innerHTML = '<p>Heç bir kateqoriya yoxdur</p>'; return; }
         container.innerHTML = `
             <table><thead><tr><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
-            <tbody>${categories.map(c => `<tr><td>${escape(c)}</td><td class="action-icons"><i class="fas fa-edit" onclick="editCategory('${escape(c)}')"></i> <i class="fas fa-trash" onclick="deleteCategory('${escape(c)}')"></i></td></tr>`).join('')}</tbody></table>
+            <tbody>${categories.map(c => `<tr><td>${escape(c)}</td><td class="action-icons"><i class="fas fa-edit" onclick="editCategory('${escape(c)}')"></i> <i class="fas fa-trash" onclick="deleteCategory('${escape(c)}')"></i></td></tr>`).join('')}</tbody>
+        </table>
         `;
         const select = document.getElementById('wordCategory');
         if (select) select.innerHTML = '<option value="">Seçin</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -505,7 +499,7 @@
 
     async function deleteCategory(cat) {
         if (!confirm(`"${cat}" kateqoriyasını silmək? Bu kateqoriyadakı sözlər kateqoriyasız qalacaq!`)) return;
-        await supabase.from('words').update({ category: null }).eq('category', cat);
+        await supabaseClient.from('words').update({ category: null }).eq('category', cat);
         loadCategories();
         loadWords();
         showAlert('✅ Kateqoriya silindi!');
@@ -513,8 +507,8 @@
 
     // ========== SÖZLƏR ==========
     async function loadWords(search = '') {
-        if (!supabase) return;
-        let query = supabase.from('words').select('*').order('created_at', { ascending: false });
+        if (!supabaseClient) return;
+        let query = supabaseClient.from('words').select('*').order('created_at', { ascending: false });
         if (search) query = query.ilike('az', `%${search}%`);
         const { data } = await query;
         words = data || [];
@@ -529,7 +523,8 @@
         container.innerHTML = `
             <table><thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
             <tbody>${pageWords.map(w => `<tr><td>${w.id}</td><td>${escape(w.az)}</td><td>${escape(w.en)}</td><td>${escape(w.level || '-')}</td><td>${escape(w.category || '-')}</td>
-            <td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>`).join('')}</tbody></table>
+            <td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>`).join('')}</tbody>
+        </table>
         `;
         renderPagination(words.length);
     }
@@ -548,7 +543,7 @@
     function goToPage(page) { currentWordPage = page; renderWordsList(); }
 
     async function addWord() {
-        if (!supabase) { showAlert('Supabase bağlı deyil!', true); return; }
+        if (!supabaseClient) { showAlert('Supabase bağlı deyil!', true); return; }
         const az = document.getElementById('wordAz').value.trim();
         const en = document.getElementById('wordEn').value.trim();
         if (!az || !en) { showAlert('Azərbaycanca və İngiliscə söz daxil edin!', true); return; }
@@ -567,7 +562,7 @@
             created_at: new Date()
         };
         
-        const { error } = await supabase.from('words').insert([newWord]);
+        const { error } = await supabaseClient.from('words').insert([newWord]);
         if (!error) {
             document.getElementById('wordAz').value = '';
             document.getElementById('wordEn').value = '';
@@ -588,7 +583,7 @@
 
     async function deleteWord(id) {
         if (!confirm('Bu sözü silmək istədiyinizdən əminsiniz?')) return;
-        const { error } = await supabase.from('words').delete().eq('id', id);
+        const { error } = await supabaseClient.from('words').delete().eq('id', id);
         if (!error) {
             loadWords();
             loadCategories();
@@ -632,17 +627,17 @@
 
     document.getElementById('saveEditBtn').onclick = async () => {
         if (editType === 'level') {
-            await supabase.from('levels').update({ name: document.getElementById('editName').value, display_order: parseInt(document.getElementById('editOrder').value) }).eq('id', editId);
+            await supabaseClient.from('levels').update({ name: document.getElementById('editName').value, display_order: parseInt(document.getElementById('editOrder').value) }).eq('id', editId);
             loadLevels();
             showAlert('✅ Səviyyə yeniləndi!');
         } else if (editType === 'category') {
             const newName = document.getElementById('editName').value;
-            if (editId !== newName) await supabase.from('words').update({ category: newName }).eq('category', editId);
+            if (editId !== newName) await supabaseClient.from('words').update({ category: newName }).eq('category', editId);
             loadCategories();
             loadWords();
             showAlert('✅ Kateqoriya yeniləndi!');
         } else if (editType === 'word') {
-            await supabase.from('words').update({
+            await supabaseClient.from('words').update({
                 az: document.getElementById('editAz').value,
                 en: document.getElementById('editEn').value,
                 level: document.getElementById('editLevel').value,

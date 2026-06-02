@@ -15,9 +15,9 @@
             --text: #1a2a3a;
             --text-light: #6c757d;
             --primary: #f5a623;
-            --primary-dark: #e09515;
             --danger: #dc3545;
             --success: #28a745;
+            --warning: #ffc107;
             --border: #dee2e6;
         }
 
@@ -55,6 +55,28 @@
         }
         .header h1 { font-size: 1.8rem; color: var(--primary); }
         .header h1 i { margin-right: 10px; }
+        
+        /* DB Status */
+        .db-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg);
+            padding: 8px 20px;
+            border-radius: 40px;
+        }
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        .status-led.connected { background: var(--success); box-shadow: 0 0 5px var(--success); }
+        .status-led.disconnected { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
+        .status-led.checking { background: var(--warning); }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .status-text { font-weight: 500; font-size: 0.85rem; }
+
         .view-site { background: var(--primary); color: #1e2a36; padding: 10px 20px; border-radius: 40px; text-decoration: none; font-weight: bold; }
 
         /* Tabs */
@@ -81,7 +103,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Cards */
         .card {
             background: var(--card);
             border-radius: 24px;
@@ -89,10 +110,8 @@
             margin-bottom: 25px;
             border: 1px solid var(--border);
         }
-        .card h3 { margin-bottom: 20px; color: var(--primary); font-size: 1.3rem; }
-        .card h3 i { margin-right: 10px; }
+        .card h3 { margin-bottom: 20px; color: var(--primary); }
 
-        /* Forms */
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; }
         input, select, textarea {
@@ -105,7 +124,7 @@
             font-size: 0.9rem;
             outline: none;
         }
-        textarea { border-radius: 20px; resize: vertical; }
+        textarea { border-radius: 20px; }
         input:focus, select:focus { border-color: var(--primary); }
 
         .btn {
@@ -114,22 +133,18 @@
             border: none;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
         }
         .btn-primary { background: var(--primary); color: #1e2a36; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-success { background: var(--success); color: white; }
         .btn-sm { padding: 6px 16px; font-size: 0.8rem; }
 
-        /* Tables */
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: var(--bg); font-weight: 600; }
-        .action-icons i { margin: 0 5px; cursor: pointer; opacity: 0.7; font-size: 1.1rem; }
+        th { background: var(--bg); }
+        .action-icons i { margin: 0 5px; cursor: pointer; opacity: 0.7; }
         .action-icons i:hover { opacity: 1; }
 
-        /* Modal */
         .modal {
             position: fixed;
             top: 0;
@@ -137,7 +152,6 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -153,19 +167,26 @@
             padding: 30px;
             width: 90%;
             max-width: 550px;
-            max-height: 85vh;
-            overflow-y: auto;
         }
         .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 25px; }
 
-        .message {
-            padding: 12px 20px;
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
             border-radius: 40px;
-            margin-bottom: 20px;
-            display: none;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.3s;
         }
-        .message.success { background: var(--success); color: white; display: block; }
-        .message.error { background: var(--danger); color: white; display: block; }
+        .alert.show { transform: translateX(0); }
+        .alert.error { background: var(--danger); }
 
         .theme-toggle {
             position: fixed;
@@ -191,7 +212,6 @@
         @media (max-width: 768px) {
             .tabs { border-radius: 20px; flex-direction: column; }
             .tab-btn { text-align: center; }
-            th, td { font-size: 0.75rem; padding: 8px; }
         }
     </style>
 </head>
@@ -199,7 +219,13 @@
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-cog"></i> Admin Panel</h1>
-        <a href="https://diloyren.rustamoff.site" class="view-site" target="_blank"><i class="fas fa-eye"></i> Sayta bax</a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div class="db-status" id="dbStatus">
+                <div class="status-led checking" id="statusLed"></div>
+                <span class="status-text" id="statusText">Yoxlanılır...</span>
+            </div>
+            <a href="#" class="view-site" id="viewSiteBtn" target="_blank"><i class="fas fa-eye"></i> Sayta bax</a>
+        </div>
     </div>
 
     <div class="tabs">
@@ -209,101 +235,71 @@
         <button class="tab-btn" data-tab="words">📖 Sözlər</button>
     </div>
 
-    <!-- Parametrlər -->
     <div id="settings-tab" class="tab-content active">
         <div class="card">
-            <h3><i class="fas fa-sliders-h"></i> Sayt Parametrləri</h3>
-            <div id="settingsMsg" class="message"></div>
-            <div class="form-group">
-                <label>Sayt Adı</label>
-                <input type="text" id="siteName" placeholder="Dil Öyrən">
-            </div>
-            <div class="form-group">
-                <label>Loqo (Şəkil)</label>
-                <input type="file" id="logoFile" accept="image/*">
-                <div id="logoPreview" style="margin-top: 10px;"></div>
-            </div>
-            <div class="form-group">
-                <label>Footer Mətni</label>
-                <textarea id="footerText" rows="2" placeholder="© 2024 Dil Öyrən"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Instagram URL</label>
-                <input type="url" id="instagramUrl" placeholder="https://instagram.com/...">
-            </div>
-            <div class="form-group">
-                <label>TikTok URL</label>
-                <input type="url" id="tiktokUrl" placeholder="https://tiktok.com/@...">
-            </div>
-            <div class="form-group">
-                <label>YouTube URL</label>
-                <input type="url" id="youtubeUrl" placeholder="https://youtube.com/@...">
-            </div>
-            <button class="btn btn-primary" id="saveSettings"><i class="fas fa-save"></i> Yadda Saxla</button>
+            <h3>Sayt Parametrləri</h3>
+            <div class="form-group"><label>Sayt Adı</label><input type="text" id="siteName" placeholder="Dil Öyrən"></div>
+            <div class="form-group"><label>Loqo Şəkli</label><input type="file" id="logoFile" accept="image/*"><div id="logoPreview" style="margin-top: 10px;"></div></div>
+            <div class="form-group"><label>Footer Mətni</label><textarea id="footerText" rows="2"></textarea></div>
+            <div class="form-group"><label>Instagram URL</label><input type="url" id="instagramUrl"></div>
+            <div class="form-group"><label>TikTok URL</label><input type="url" id="tiktokUrl"></div>
+            <div class="form-group"><label>YouTube URL</label><input type="url" id="youtubeUrl"></div>
+            <button class="btn btn-primary" id="saveSettingsBtn">💾 Yadda Saxla</button>
         </div>
     </div>
 
-    <!-- Səviyyələr -->
     <div id="levels-tab" class="tab-content">
         <div class="card">
-            <h3><i class="fas fa-plus"></i> Yeni Səviyyə</h3>
-            <div class="form-group">
-                <input type="text" id="newLevel" placeholder="Səviyyə adı (Basic, Intermediate...)">
-            </div>
-            <button class="btn btn-primary" id="addLevelBtn">Əlavə Et</button>
+            <h3>Yeni Səviyyə</h3>
+            <div class="form-group"><input type="text" id="newLevel" placeholder="Səviyyə adı (məs: Basic)"></div>
+            <button class="btn btn-primary" id="addLevelBtn">➕ Əlavə Et</button>
         </div>
         <div class="card">
-            <h3><i class="fas fa-list"></i> Səviyyələr Siyahısı</h3>
+            <h3>Səviyyələr Siyahısı</h3>
             <div id="levelsList" class="table-wrapper"></div>
         </div>
     </div>
 
-    <!-- Kateqoriyalar -->
     <div id="categories-tab" class="tab-content">
         <div class="card">
-            <h3><i class="fas fa-plus"></i> Yeni Kateqoriya</h3>
-            <div class="form-group">
-                <input type="text" id="newCategory" placeholder="Kateqoriya adı (Salamlaşma, Hərəkət...)">
-            </div>
-            <button class="btn btn-primary" id="addCategoryBtn">Əlavə Et</button>
+            <h3>Yeni Kateqoriya</h3>
+            <div class="form-group"><input type="text" id="newCategory" placeholder="Kateqoriya adı (məs: Salamlaşma)"></div>
+            <button class="btn btn-primary" id="addCategoryBtn">➕ Əlavə Et</button>
         </div>
         <div class="card">
-            <h3><i class="fas fa-list"></i> Kateqoriyalar Siyahısı</h3>
+            <h3>Kateqoriyalar Siyahısı</h3>
             <div id="categoriesList" class="table-wrapper"></div>
         </div>
     </div>
 
-    <!-- Sözlər -->
     <div id="words-tab" class="tab-content">
         <div class="card">
-            <h3><i class="fas fa-plus"></i> Yeni Söz Əlavə Et</h3>
-            <div id="wordMsg" class="message"></div>
-            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="form-group"><label>Azərbaycanca *</label><input type="text" id="wordAz" placeholder="Salam"></div>
-                <div class="form-group"><label>İngiliscə *</label><input type="text" id="wordEn" placeholder="Hello"></div>
+            <h3>Yeni Söz</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group"><label>Azərbaycanca *</label><input type="text" id="wordAz"></div>
+                <div class="form-group"><label>İngiliscə *</label><input type="text" id="wordEn"></div>
             </div>
-            <div class="form-group"><label>Oxunuş (İngiliscə)</label><input type="text" id="wordEnRead" placeholder="helou"></div>
-            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group"><label>Oxunuş</label><input type="text" id="wordEnRead"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div class="form-group"><label>Səviyyə</label><select id="wordLevel"></select></div>
                 <div class="form-group"><label>Kateqoriya</label><select id="wordCategory"></select></div>
             </div>
             <details style="margin-bottom: 15px;">
                 <summary style="cursor: pointer; color: var(--primary);">Digər dillər (isteğe bağlı)</summary>
                 <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group"><label>Rusca</label><input type="text" id="wordRu" placeholder="Привет"></div>
-                    <div class="form-group"><label>Almanca</label><input type="text" id="wordDe" placeholder="Hallo"></div>
-                    <div class="form-group"><label>İspanca</label><input type="text" id="wordEs" placeholder="Hola"></div>
-                    <div class="form-group"><label>Portuqalca</label><input type="text" id="wordPt" placeholder="Olá"></div>
-                    <div class="form-group"><label>Türkcə</label><input type="text" id="wordTr" placeholder="Merhaba"></div>
-                    <div class="form-group"><label>Çincə</label><input type="text" id="wordZh" placeholder="你好"></div>
+                    <div class="form-group"><label>Rusca</label><input type="text" id="wordRu"></div>
+                    <div class="form-group"><label>Almanca</label><input type="text" id="wordDe"></div>
+                    <div class="form-group"><label>İspanca</label><input type="text" id="wordEs"></div>
+                    <div class="form-group"><label>Portuqalca</label><input type="text" id="wordPt"></div>
+                    <div class="form-group"><label>Türkcə</label><input type="text" id="wordTr"></div>
+                    <div class="form-group"><label>Çincə</label><input type="text" id="wordZh"></div>
                 </div>
             </details>
-            <button class="btn btn-primary" id="addWordBtn"><i class="fas fa-plus"></i> Söz Əlavə Et</button>
+            <button class="btn btn-primary" id="addWordBtn">➕ Söz Əlavə Et</button>
         </div>
-
         <div class="card">
-            <h3><i class="fas fa-search"></i> Sözlər Siyahısı</h3>
-            <div class="form-group"><input type="text" id="searchWord" placeholder="🔍 Söz axtar..."></div>
+            <h3>Sözlər Siyahısı</h3>
+            <div class="form-group"><input type="text" id="searchWord" placeholder="🔍 Axtar..."></div>
             <div id="wordsList" class="table-wrapper"></div>
             <div id="wordsPagination" class="pagination"></div>
         </div>
@@ -312,7 +308,6 @@
 
 <div class="theme-toggle" id="themeToggle">🌙</div>
 
-<!-- Redaktə Modalı -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle">Redaktə Et</h3>
@@ -322,6 +317,11 @@
             <button class="btn" id="closeModalBtn">Bağla</button>
         </div>
     </div>
+</div>
+
+<div id="alertMessage" class="alert">
+    <i class="fas fa-check-circle"></i>
+    <span id="alertText"></span>
 </div>
 
 <script>
@@ -336,13 +336,53 @@
     const wordsPerPage = 20;
     let editType = null;
     let editId = null;
+    let isConnected = false;
 
-    if (typeof supabase !== 'undefined') {
-        supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // DB əlaqə statusu
+    async function checkDBConnection() {
+        const statusLed = document.getElementById('statusLed');
+        const statusText = document.getElementById('statusText');
+        
+        if (typeof supabase === 'undefined') {
+            statusLed.className = 'status-led disconnected';
+            statusText.innerHTML = '❌ Supabase yüklənmədi';
+            isConnected = false;
+            return;
+        }
+        
+        try {
+            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const { data, error } = await supabase.from('site_settings').select('id').limit(1);
+            if (!error) {
+                statusLed.className = 'status-led connected';
+                statusText.innerHTML = '✅ Bağlı';
+                isConnected = true;
+            } else {
+                throw new Error(error.message);
+            }
+        } catch(e) {
+            statusLed.className = 'status-led disconnected';
+            statusText.innerHTML = '❌ Bağlı deyil';
+            isConnected = false;
+            console.error('DB bağlantı xətası:', e);
+        }
     }
 
-    // ========== Parametrlər ==========
+    // Alert göstər
+    function showAlert(message, isError = false) {
+        const alertDiv = document.getElementById('alertMessage');
+        const alertText = document.getElementById('alertText');
+        alertText.textContent = message;
+        alertDiv.className = isError ? 'alert error' : 'alert';
+        alertDiv.classList.add('show');
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+        }, 3000);
+    }
+
+    // ========== PARAMETRLƏR ==========
     async function loadSettings() {
+        if (!supabase) return;
         const { data } = await supabase.from('site_settings').select('*').limit(1);
         if (data && data[0]) {
             document.getElementById('siteName').value = data[0].site_name || '';
@@ -351,12 +391,15 @@
             document.getElementById('tiktokUrl').value = data[0].tiktok_url || '';
             document.getElementById('youtubeUrl').value = data[0].youtube_url || '';
             if (data[0].logo_path) {
-                document.getElementById('logoPreview').innerHTML = `<img src="${SUPABASE_URL}/storage/v1/object/public/logos/${data[0].logo_path}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover;">`;
+                document.getElementById('logoPreview').innerHTML = `<img src="${SUPABASE_URL}/storage/v1/object/public/logos/${data[0].logo_path}" style="width: 50px; height: 50px; border-radius: 12px;">`;
             }
         }
+        const siteName = document.getElementById('siteName').value || 'diloyren';
+        document.getElementById('viewSiteBtn').href = `https://${siteName.toLowerCase().replace(/\s/g, '')}.rustamoff.site`;
     }
 
     async function saveSettings() {
+        if (!supabase) { showAlert('Supabase bağlı deyil!', true); return; }
         const site_name = document.getElementById('siteName').value;
         const footer_text = document.getElementById('footerText').value;
         const instagram_url = document.getElementById('instagramUrl').value;
@@ -366,78 +409,86 @@
         const { data: existing } = await supabase.from('site_settings').select('id').limit(1);
         let result;
         if (existing && existing[0]) {
-            result = await supabase.from('site_settings').update({ site_name, footer_text, instagram_url, tiktok_url, youtube_url, updated_at: new Date() }).eq('id', existing[0].id);
+            result = await supabase.from('site_settings').update({ site_name, footer_text, instagram_url, tiktok_url, youtube_url }).eq('id', existing[0].id);
         } else {
             result = await supabase.from('site_settings').insert([{ site_name, footer_text, instagram_url, tiktok_url, youtube_url }]);
         }
-        if (!result.error) showMsg('settingsMsg', 'Parametrlər yadda saxlandı!', 'success');
-        else showMsg('settingsMsg', 'Xəta: ' + result.error.message, 'error');
+        if (!result.error) {
+            showAlert('✅ Parametrlər yadda saxlandı!');
+            loadSettings();
+        } else {
+            showAlert('❌ Xəta: ' + result.error.message, true);
+        }
     }
 
-    // Şəkil yükləmə
     document.getElementById('logoFile')?.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        try {
-            const fileName = `logo_${Date.now()}.jpg`;
-            const { error } = await supabase.storage.from('logos').upload(fileName, file);
-            if (error) throw error;
-            const { data: existing } = await supabase.from('site_settings').select('id').limit(1);
-            if (existing && existing[0]) {
-                await supabase.from('site_settings').update({ logo_path: fileName }).eq('id', existing[0].id);
-            } else {
-                await supabase.from('site_settings').insert([{ logo_path: fileName }]);
-            }
-            loadSettings();
-            showMsg('settingsMsg', 'Loqo yükləndi!', 'success');
-        } catch(err) { showMsg('settingsMsg', 'Xəta: ' + err.message, 'error'); }
+        const fileName = `logo_${Date.now()}.jpg`;
+        const { error } = await supabase.storage.from('logos').upload(fileName, file);
+        if (error) { showAlert('❌ Xəta: ' + error.message, true); return; }
+        const { data: existing } = await supabase.from('site_settings').select('id').limit(1);
+        if (existing && existing[0]) {
+            await supabase.from('site_settings').update({ logo_path: fileName }).eq('id', existing[0].id);
+        } else {
+            await supabase.from('site_settings').insert([{ logo_path: fileName }]);
+        }
+        loadSettings();
+        showAlert('✅ Loqo yükləndi!');
     });
 
-    // ========== Səviyyələr ==========
+    // ========== SƏVİYYƏLƏR ==========
     async function loadLevels() {
+        if (!supabase) return;
         const { data } = await supabase.from('levels').select('*').order('display_order');
         levels = data || [];
         const container = document.getElementById('levelsList');
         if (levels.length === 0) { container.innerHTML = '<p>Heç bir səviyyə yoxdur</p>'; return; }
         container.innerHTML = `
-            <table>
-                <thead><tr><th>ID</th><th>Ad</th><th>Sıra</th><th>Əməliyyat</th></tr></thead>
-                <tbody>${levels.map(l => `
-                    <tr><td>${l.id}</td><td>${escape(l.name)}</td><td>${l.display_order || 0}</td>
-                    <td class="action-icons"><i class="fas fa-edit" onclick="editLevel(${l.id}, '${escape(l.name)}', ${l.display_order || 0})"></i> <i class="fas fa-trash" onclick="deleteLevel(${l.id})"></i></td></tr>
-                `).join('')}</tbody>
-            </table>
+            <table><thead><tr><th>ID</th><th>Ad</th><th>Sıra</th><th>Əməliyyat</th></tr></thead>
+            <tbody>${levels.map(l => `<tr><td>${l.id}</td><td>${escape(l.name)}</td><td>${l.display_order || 0}</td>
+            <td class="action-icons"><i class="fas fa-edit" onclick="editLevel(${l.id}, '${escape(l.name)}', ${l.display_order || 0})"></i> <i class="fas fa-trash" onclick="deleteLevel(${l.id})"></i></td></tr>`).join('')}</tbody></table>
         `;
         const select = document.getElementById('wordLevel');
         if (select) select.innerHTML = '<option value="">Seçin</option>' + levels.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
     }
 
     async function addLevel() {
+        if (!supabase) { showAlert('Supabase bağlı deyil!', true); return; }
         const name = document.getElementById('newLevel').value.trim();
-        if (!name) return;
-        await supabase.from('levels').insert([{ name, display_order: levels.length + 1 }]);
-        document.getElementById('newLevel').value = '';
-        loadLevels();
+        if (!name) { showAlert('Səviyyə adı daxil edin!', true); return; }
+        const { error } = await supabase.from('levels').insert([{ name, display_order: levels.length + 1 }]);
+        if (!error) {
+            document.getElementById('newLevel').value = '';
+            loadLevels();
+            showAlert('✅ Səviyyə əlavə edildi!');
+        } else {
+            showAlert('❌ Xəta: ' + error.message, true);
+        }
     }
 
     async function deleteLevel(id) {
         if (!confirm('Silmək istədiyinizdən əminsiniz?')) return;
-        await supabase.from('levels').delete().eq('id', id);
-        loadLevels();
+        const { error } = await supabase.from('levels').delete().eq('id', id);
+        if (!error) {
+            loadLevels();
+            showAlert('✅ Səviyyə silindi!');
+        } else {
+            showAlert('❌ Xəta: ' + error.message, true);
+        }
     }
 
-    // ========== Kateqoriyalar ==========
+    // ========== KATEQORİYALAR ==========
     async function loadCategories() {
+        if (!supabase) return;
         const { data } = await supabase.from('words').select('category').not('category', 'is', null);
         const unique = [...new Set(data.map(w => w.category).filter(c => c))];
         categories = unique.sort();
         const container = document.getElementById('categoriesList');
         if (categories.length === 0) { container.innerHTML = '<p>Heç bir kateqoriya yoxdur</p>'; return; }
         container.innerHTML = `
-            <table>
-                <thead><tr><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
-                <tbody>${categories.map(c => `<tr><td>${escape(c)}</td><td class="action-icons"><i class="fas fa-edit" onclick="editCategory('${escape(c)}')"></i> <i class="fas fa-trash" onclick="deleteCategory('${escape(c)}')"></i></td></tr>`).join('')}</tbody>
-            </table>
+            <table><thead><tr><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
+            <tbody>${categories.map(c => `<tr><td>${escape(c)}</td><td class="action-icons"><i class="fas fa-edit" onclick="editCategory('${escape(c)}')"></i> <i class="fas fa-trash" onclick="deleteCategory('${escape(c)}')"></i></td></tr>`).join('')}</tbody></table>
         `;
         const select = document.getElementById('wordCategory');
         if (select) select.innerHTML = '<option value="">Seçin</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -445,20 +496,24 @@
 
     async function addCategory() {
         const name = document.getElementById('newCategory').value.trim();
-        if (!name) return;
+        if (!name) { showAlert('Kateqoriya adı daxil edin!', true); return; }
+        if (categories.includes(name)) { showAlert('Bu kateqoriya artıq mövcuddur!', true); return; }
         document.getElementById('newCategory').value = '';
         loadCategories();
+        showAlert('✅ Kateqoriya əlavə edildi! (söz əlavə edərkən istifadə edə bilərsiniz)');
     }
 
     async function deleteCategory(cat) {
-        if (!confirm(`"${cat}" kateqoriyasını silmək? Bütün sözlər təsirlənəcək!`)) return;
+        if (!confirm(`"${cat}" kateqoriyasını silmək? Bu kateqoriyadakı sözlər kateqoriyasız qalacaq!`)) return;
         await supabase.from('words').update({ category: null }).eq('category', cat);
         loadCategories();
         loadWords();
+        showAlert('✅ Kateqoriya silindi!');
     }
 
-    // ========== Sözlər ==========
+    // ========== SÖZLƏR ==========
     async function loadWords(search = '') {
+        if (!supabase) return;
         let query = supabase.from('words').select('*').order('created_at', { ascending: false });
         if (search) query = query.ilike('az', `%${search}%`);
         const { data } = await query;
@@ -472,13 +527,9 @@
         const container = document.getElementById('wordsList');
         if (pageWords.length === 0) { container.innerHTML = '<p>Heç bir söz yoxdur</p>'; renderPagination(0); return; }
         container.innerHTML = `
-            <table>
-                <thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
-                <tbody>${pageWords.map(w => `
-                    <tr><td>${w.id}</td><td>${escape(w.az)}</td><td>${escape(w.en)}</td><td>${escape(w.level || '-')}</td><td>${escape(w.category || '-')}</td>
-                    <td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>
-                `).join('')}</tbody>
-            </table>
+            <table><thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
+            <tbody>${pageWords.map(w => `<tr><td>${w.id}</td><td>${escape(w.az)}</td><td>${escape(w.en)}</td><td>${escape(w.level || '-')}</td><td>${escape(w.category || '-')}</td>
+            <td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>`).join('')}</tbody></table>
         `;
         renderPagination(words.length);
     }
@@ -497,9 +548,10 @@
     function goToPage(page) { currentWordPage = page; renderWordsList(); }
 
     async function addWord() {
+        if (!supabase) { showAlert('Supabase bağlı deyil!', true); return; }
         const az = document.getElementById('wordAz').value.trim();
         const en = document.getElementById('wordEn').value.trim();
-        if (!az || !en) { showMsg('wordMsg', 'Azərbaycanca və İngiliscə söz daxil edin!', 'error'); return; }
+        if (!az || !en) { showAlert('Azərbaycanca və İngiliscə söz daxil edin!', true); return; }
         
         const newWord = {
             az, en,
@@ -526,22 +578,27 @@
             document.getElementById('wordPt').value = '';
             document.getElementById('wordTr').value = '';
             document.getElementById('wordZh').value = '';
-            showMsg('wordMsg', 'Söz əlavə edildi!', 'success');
             loadWords();
             loadCategories();
+            showAlert('✅ Söz əlavə edildi!');
         } else {
-            showMsg('wordMsg', 'Xəta: ' + error.message, 'error');
+            showAlert('❌ Xəta: ' + error.message, true);
         }
     }
 
     async function deleteWord(id) {
-        if (!confirm('Bu sözü silmək?')) return;
-        await supabase.from('words').delete().eq('id', id);
-        loadWords();
-        loadCategories();
+        if (!confirm('Bu sözü silmək istədiyinizdən əminsiniz?')) return;
+        const { error } = await supabase.from('words').delete().eq('id', id);
+        if (!error) {
+            loadWords();
+            loadCategories();
+            showAlert('✅ Söz silindi!');
+        } else {
+            showAlert('❌ Xəta: ' + error.message, true);
+        }
     }
 
-    // ========== Modal Redaktə ==========
+    // ========== MODAL ==========
     window.editLevel = (id, name, order) => {
         editType = 'level'; editId = id;
         document.getElementById('modalTitle').innerText = 'Səviyyəni Redaktə Et';
@@ -575,17 +632,15 @@
 
     document.getElementById('saveEditBtn').onclick = async () => {
         if (editType === 'level') {
-            const newName = document.getElementById('editName').value;
-            const newOrder = parseInt(document.getElementById('editOrder').value);
-            await supabase.from('levels').update({ name: newName, display_order: newOrder }).eq('id', editId);
+            await supabase.from('levels').update({ name: document.getElementById('editName').value, display_order: parseInt(document.getElementById('editOrder').value) }).eq('id', editId);
             loadLevels();
+            showAlert('✅ Səviyyə yeniləndi!');
         } else if (editType === 'category') {
             const newName = document.getElementById('editName').value;
-            if (editId !== newName) {
-                await supabase.from('words').update({ category: newName }).eq('category', editId);
-                loadCategories();
-                loadWords();
-            }
+            if (editId !== newName) await supabase.from('words').update({ category: newName }).eq('category', editId);
+            loadCategories();
+            loadWords();
+            showAlert('✅ Kateqoriya yeniləndi!');
         } else if (editType === 'word') {
             await supabase.from('words').update({
                 az: document.getElementById('editAz').value,
@@ -594,41 +649,24 @@
                 category: document.getElementById('editCategory').value
             }).eq('id', editId);
             loadWords();
+            showAlert('✅ Söz yeniləndi!');
         }
         document.getElementById('editModal').classList.remove('active');
     };
+    document.getElementById('closeModalBtn').onclick = () => document.getElementById('editModal').classList.remove('active');
 
-    document.getElementById('closeModalBtn').onclick = () => {
-        document.getElementById('editModal').classList.remove('active');
-    };
-
-    // ========== Yardımçı funksiyalar ==========
-    function showMsg(elementId, msg, type) {
-        const el = document.getElementById(elementId);
-        el.textContent = msg;
-        el.className = `message ${type}`;
-        setTimeout(() => { el.style.display = 'none'; el.className = 'message'; }, 3000);
-        el.style.display = 'block';
-    }
-
+    // ========== YARDIMÇI ==========
     function escape(str) { return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
     // Tab keçid
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', function() {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
+            this.classList.add('active');
+            document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
         });
     });
-
-    // Event listeners
-    document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
-    document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
-    document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
-    document.getElementById('addWordBtn')?.addEventListener('click', addWord);
-    document.getElementById('searchWord')?.addEventListener('input', (e) => { currentWordPage = 1; loadWords(e.target.value); });
 
     // Dark mode
     let dark = localStorage.getItem('adminDark') === 'true';
@@ -638,12 +676,25 @@
         localStorage.setItem('adminDark', document.body.classList.contains('dark'));
     };
 
+    // Event listeners
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
+    document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
+    document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
+    document.getElementById('addWordBtn')?.addEventListener('click', addWord);
+    document.getElementById('searchWord')?.addEventListener('input', (e) => { currentWordPage = 1; loadWords(e.target.value); });
+
     // İnitial
     async function init() {
-        await loadSettings();
-        await loadLevels();
-        await loadCategories();
-        await loadWords();
+        await checkDBConnection();
+        if (isConnected) {
+            await loadSettings();
+            await loadLevels();
+            await loadCategories();
+            await loadWords();
+            showAlert('✅ Admin panel hazırdır!');
+        } else {
+            showAlert('⚠️ Supabase bağlantısı yoxdur! Zəhmət olmasa internet bağlantınızı yoxlayın.', true);
+        }
     }
     init();
 </script>

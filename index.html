@@ -4,22 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>Admin Panel - Dil Öyrən</title>
+        <link rel="icon" href="https://cdn-icons-png.flaticon.com/32/197/197374.png" type="image/png">
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             min-height: 100vh;
             padding: 10px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(245,166,35,0.05) 0%, transparent 50%);
+            pointer-events: none;
         }
         body.dark {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #0a0a1a, #0f0f23, #1a1a2e);
         }
         
-        /* Login */
         .login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85);
@@ -32,15 +46,16 @@
         }
         .login-overlay.hidden { display: none; }
         .login-card {
-            background: white;
+            background: linear-gradient(135deg, #fff, #f8f9fa);
             border-radius: 32px;
-            padding: 28px 20px;
+            padding: 32px 24px;
             width: 100%;
             max-width: 380px;
             text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
-        body.dark .login-card { background: #1e293b; }
-        .login-card h2 { font-size: 1.4rem; margin-bottom: 8px; background: linear-gradient(135deg, #f5a623, #ff8c42); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        body.dark .login-card { background: linear-gradient(135deg, #1e293b, #0f1724); }
+        .login-card h2 { font-size: 1.5rem; margin-bottom: 8px; background: linear-gradient(135deg, #f5a623, #ff8c42); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .login-card input {
             width: 100%;
             padding: 12px;
@@ -61,275 +76,365 @@
             background: linear-gradient(135deg, #f5a623, #ff8c42);
             color: #1e2a36;
             cursor: pointer;
+            transition: transform 0.2s;
         }
+        .login-card button:hover { transform: scale(1.02); }
         
         .admin-container { display: none; max-width: 1400px; margin: 0 auto; }
         .admin-container.visible { display: block; }
         
+        /* Header */
         .header {
-            background: white;
-            border-radius: 16px;
-            padding: 10px 14px;
-            margin-bottom: 12px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        body.dark .header { background: #1e293b; }
-        .header h1 { color: #f5a623; font-size: 1rem; }
-        .view-site { background: #f5a623; color: #1e2a36; padding: 5px 12px; border-radius: 40px; text-decoration: none; font-weight: bold; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 5px; }
+        body.dark .header { background: rgba(30,41,59,0.95); border-color: rgba(255,255,255,0.05); }
+        .header h1 { background: linear-gradient(135deg, #f5a623, #ff8c42); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 1.2rem; }
+        .view-site { background: linear-gradient(135deg, #f5a623, #ff8c42); color: #1e2a36; padding: 6px 14px; border-radius: 40px; text-decoration: none; font-weight: bold; font-size: 0.75rem; transition: transform 0.2s; }
+        .view-site:hover { transform: scale(1.05); }
         
+        /* Stats Cards - Premium Rəngli Dizayn */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(6, 1fr); } }
+        
+        .stat-card {
+            border-radius: 24px;
+            padding: 20px 12px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .stat-card:hover::before { left: 100%; }
+        .stat-card:hover { transform: translateY(-8px) scale(1.02); }
+        
+        .stat-card:nth-child(1) { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .stat-card:nth-child(2) { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .stat-card:nth-child(3) { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+        .stat-card:nth-child(4) { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a2a36; }
+        .stat-card:nth-child(5) { background: linear-gradient(135deg, #fa709a, #fee140); color: #1a2a36; }
+        .stat-card:nth-child(6) { background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: white; }
+        
+        .stat-card i { font-size: 32px; margin-bottom: 12px; display: inline-block; }
+        .stat-card .stat-value { font-size: 32px; font-weight: 800; margin: 8px 0; letter-spacing: 1px; }
+        .stat-card .stat-label { font-size: 12px; opacity: 0.9; font-weight: 500; }
+        
+        /* Chart Cards */
+        .chart-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s;
+        }
+        .chart-card:hover { transform: translateY(-4px); }
+        body.dark .chart-card { background: rgba(30,41,59,0.95); }
+        .chart-card h4 { margin-bottom: 16px; color: #f5a623; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        canvas { max-height: 280px; width: 100% !important; }
+        
+        /* Tabs */
         .tabs {
             display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-            background: white;
-            padding: 6px 10px;
-            border-radius: 50px;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 60px;
             overflow-x: auto;
             white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        body.dark .tabs { background: #1e293b; }
+        body.dark .tabs { background: rgba(30,41,59,0.95); }
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 6px 14px;
+            padding: 8px 20px;
             border-radius: 40px;
             font-weight: 600;
             cursor: pointer;
             color: #333;
-            font-size: 0.75rem;
-            white-space: nowrap;
+            font-size: 0.8rem;
+            transition: all 0.3s;
         }
         body.dark .tab-btn { color: white; }
-        .tab-btn.active { background: #f5a623; color: #1e2a36; }
+        .tab-btn.active { background: linear-gradient(135deg, #f5a623, #ff8c42); color: #1e2a36; }
         
-        .tab-content { display: none; background: white; border-radius: 16px; padding: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        body.dark .tab-content { background: #1e293b; }
+        .tab-content { display: none; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-top: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        body.dark .tab-content { background: rgba(30,41,59,0.95); }
         .tab-content.active { display: block; }
         
-        .card { margin-bottom: 16px; }
-        .card h3 { font-size: 1rem; margin-bottom: 12px; color: #f5a623; border-left: 3px solid #f5a623; padding-left: 10px; }
+        .card { margin-bottom: 20px; }
+        .card h3 { font-size: 1.1rem; margin-bottom: 16px; color: #f5a623; border-left: 3px solid #f5a623; padding-left: 12px; }
         
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.7rem; color: #4a627a; }
+        .form-group { margin-bottom: 14px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.75rem; color: #4a627a; }
         body.dark label { color: #94a3b8; }
         
         input, select, textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 12px 16px;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 16px;
             background: white;
             font-size: 14px;
+            transition: all 0.3s;
         }
-        
-        select {
-            -webkit-appearance: menulist;
-            appearance: menulist;
-            cursor: pointer;
-            font-size: 14px;
-            min-height: 42px;
-        }
-        
-        body.dark select, body.dark input, body.dark textarea { background: #334155; border-color: #475569; color: white; }
-        input:focus, select:focus, textarea:focus { border-color: #f5a623; outline: none; }
+        body.dark input, body.dark select, body.dark textarea { background: #334155; border-color: #475569; color: white; }
+        input:focus, select:focus, textarea:focus { border-color: #f5a623; outline: none; box-shadow: 0 0 0 3px rgba(245,166,35,0.2); }
         
         .btn {
-            padding: 10px 16px;
-            border-radius: 12px;
+            padding: 12px 20px;
+            border-radius: 40px;
             border: none;
             font-weight: bold;
             cursor: pointer;
             font-size: 0.85rem;
-            width: 100%;
+            transition: all 0.3s;
         }
-        .btn-primary { background: #f5a623; color: #1e2a36; }
-        .btn-sm { padding: 6px 12px; font-size: 0.75rem; width: auto; }
+        .btn-primary { background: linear-gradient(135deg, #f5a623, #ff8c42); color: #1e2a36; }
+        .btn-danger { background: linear-gradient(135deg, #dc3545, #c82333); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #ffc107, #e0a800); color: #1e2a36; }
+        .btn:hover { transform: scale(1.02); opacity: 0.95; }
         
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 550px; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.75rem; }
+        .table-wrapper { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 650px; }
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem; }
         body.dark th, body.dark td { border-color: #334155; }
-        th { background: #f8fafc; font-weight: 600; }
+        th { background: linear-gradient(135deg, #f8fafc, #f1f5f9); font-weight: 600; }
         body.dark th { background: #0f1724; }
         
-        .action-icons i { margin: 0 4px; cursor: pointer; font-size: 14px; padding: 4px; }
+        .action-icons i { margin: 0 6px; cursor: pointer; font-size: 16px; transition: transform 0.2s; }
+        .action-icons i:hover { transform: scale(1.15); }
         .fa-edit { color: #f5a623; }
         .fa-trash { color: #dc3545; }
+        .drag-handle { cursor: grab; color: #94a3b8; font-size: 18px; }
+        .drag-handle:active { cursor: grabbing; }
         
-        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        @media (min-width: 640px) {
-            body { padding: 16px; }
-            .grid-2 { grid-template-columns: 1fr 1fr; }
-            .header h1 { font-size: 1.2rem; }
-            .tab-btn { padding: 8px 18px; font-size: 0.85rem; }
-            .tab-content { padding: 20px; }
-        }
-        
-        /* ========== MOBIL ÜÇÜN DROPDOWN, KOMPÜTER ÜÇÜN BUTON ========== */
-        .filter-wrapper {
-            margin-bottom: 16px;
-        }
-        
-        /* Mobil (768px və aşağı) - Dropdown göstər */
-        @media (max-width: 768px) {
-            .level-buttons, .category-buttons {
-                display: none;
-            }
-            .level-dropdown, .category-dropdown {
-                display: block;
-            }
-            .level-dropdown select, .category-dropdown select {
-                width: 100%;
-                padding: 12px;
-                font-size: 16px;
-                border-radius: 12px;
-            }
-        }
-        
-        /* Kompüter (768px yuxarı) - Buton göstər */
-        @media (min-width: 769px) {
-            .level-buttons, .category-buttons {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            .level-dropdown, .category-dropdown {
-                display: none;
-            }
-            .filter-btn {
-                background: #f1f5f9;
-                border: 1px solid #e2e8f0;
-                padding: 8px 16px;
-                border-radius: 40px;
-                font-weight: 600;
-                font-size: 0.75rem;
-                cursor: pointer;
-                color: #1e2a3a;
-                transition: all 0.2s;
-            }
-            body.dark .filter-btn {
-                background: #334155;
-                border-color: #475569;
-                color: white;
-            }
-            .filter-btn.active {
-                background: #f5a623;
-                color: #1e2a36;
-                border-color: #f5a623;
-            }
-        }
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
         
         .category-badge {
-            background: #f5a62320;
+            background: linear-gradient(135deg, #f5a62320, #ff8c4220);
             color: #f5a623;
-            padding: 3px 8px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 10px;
+            font-size: 11px;
             display: inline-block;
+            font-weight: 600;
         }
+        
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 16px;
+        }
+        body.dark .filter-bar { background: rgba(255,255,255,0.03); }
+        .filter-select { flex: 1; min-width: 180px; }
         
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 1000;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 2000;
             display: flex; align-items: center; justify-content: center;
             visibility: hidden; opacity: 0;
-            padding: 16px;
+            transition: 0.3s;
         }
         .modal-overlay.active { visibility: visible; opacity: 1; }
         .modal-content {
-            background: white; border-radius: 20px; padding: 16px;
-            width: 100%; max-width: 550px; max-height: 85vh; overflow-y: auto;
+            background: white; border-radius: 28px; padding: 24px;
+            width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto;
         }
         body.dark .modal-content { background: #1e293b; }
         
         .toast {
-            position: fixed; bottom: 20px; right: 20px; left: 20px;
-            background: #28a745; color: white; padding: 12px 16px;
-            border-radius: 12px; z-index: 2000; display: none;
-            text-align: center; font-size: 0.85rem;
+            position: fixed; bottom: 30px; right: 30px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white; padding: 14px 24px;
+            border-radius: 60px;
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
         }
-        @media (min-width: 640px) { .toast { left: auto; max-width: 350px; border-radius: 40px; } }
-        .toast.error { background: #dc3545; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast.error { background: linear-gradient(135deg, #dc3545, #c82333); }
+        .toast.show { display: flex; }
         
         .theme-toggle {
-            position: fixed; bottom: 16px; left: 16px;
-            width: 40px; height: 40px; border-radius: 50%;
-            background: white; border: 1px solid #ddd;
-            cursor: pointer; font-size: 18px;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed; bottom: 20px; left: 20px;
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
         }
-        body.dark .theme-toggle { background: #1e293b; color: white; border-color: #475569; }
+        .theme-toggle:hover { transform: scale(1.1); }
+        body.dark .theme-toggle { background: #1e293b; color: white; }
         
-        .pagination { display: flex; gap: 5px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
-        .page-btn { padding: 6px 12px; border-radius: 10px; background: #f1f5f9; border: none; cursor: pointer; font-size: 0.7rem; min-width: 36px; }
+        .pagination { display: flex; gap: 6px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .page-btn {
+            padding: 8px 14px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            border: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            min-width: 40px;
+            transition: all 0.2s;
+        }
+        .page-btn:hover { background: #f5a623; color: #1e2a36; }
         body.dark .page-btn { background: #334155; color: white; }
         .page-btn.active { background: #f5a623; color: #1e2a36; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        .word-count { font-size: 0.7rem; color: #666; margin-bottom: 10px; }
+        .word-count { font-size: 0.75rem; color: #666; margin-bottom: 12px; }
         body.dark .word-count { color: #94a3b8; }
         
-        .list-item {
+        .info-text {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            padding: 8px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 12px;
+        }
+        body.dark .info-text { background: rgba(255,255,255,0.03); color: #94a3b8; }
+        
+        .lang-section {
+            background: rgba(0,0,0,0.02);
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        body.dark .lang-section { background: rgba(255,255,255,0.02); }
+        .lang-title { font-weight: bold; margin-bottom: 8px; font-size: 0.8rem; color: #f5a623; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f5a623, #ff8c42);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .sortable-row { transition: all 0.2s; }
+        .sortable-ghost { opacity: 0.4; background: #f5a62330; }
+        
+        /* Toplu silmə bölməsi */
+        .delete-all-section {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #fca5a5;
+        }
+        body.dark .delete-all-section {
+            background: linear-gradient(135deg, #450a0a, #7f1d1d);
+            border-color: #dc2626;
+        }
+        .delete-category-section {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcc80;
+        }
+        body.dark .delete-category-section {
+            background: linear-gradient(135deg, #3e2a1f, #5c3d1a);
+            border-color: #f5a623;
+        }
+        
+        .stat-detail-card {
+            background: rgba(0,0,0,0.03);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        body.dark .stat-detail-card { background: rgba(255,255,255,0.03); }
+        .stat-detail-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #f5a623;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-list { display: flex; flex-direction: column; gap: 10px; }
+        .stat-list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #e2e8f0;
-            flex-wrap: wrap;
-            gap: 8px;
         }
-        body.dark .list-item { border-color: #334155; }
-        .list-item-name { font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
-        .list-item-actions i { margin-left: 6px; cursor: pointer; font-size: 14px; padding: 5px; }
+        body.dark .stat-list-item { border-color: #334155; }
+        .stat-list-label { font-size: 13px; }
+        .stat-list-value { font-weight: bold; font-size: 16px; color: #f5a623; }
         
-        .info-text {
-            margin-top: 10px;
-            font-size: 10px;
-            color: #888;
-            text-align: center;
-            padding: 6px;
-            background: #f8fafc;
-            border-radius: 10px;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
-        body.dark .info-text { background: #0f1724; color: #94a3b8; }
-        
-        .order-number {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: #f5a62320;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            font-weight: bold;
-            font-size: 11px;
-            color: #f5a623;
-        }
-        
-        .lang-section {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 12px;
-        }
-        body.dark .lang-section { background: #0f1724; }
-        .lang-title { font-weight: bold; margin-bottom: 8px; font-size: 0.75rem; color: #f5a623; }
-        
-        /* Filter title */
-        .filter-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #4a627a;
-            margin-bottom: 8px;
-            margin-top: 12px;
-        }
-        body.dark .filter-title { color: #94a3b8; }
+        .animate-pulse { animation: pulse 2s infinite; }
     </style>
 </head>
 <body>
@@ -353,10 +458,62 @@
     </div>
 
     <div class="tabs">
+        <button class="tab-btn" data-tab="stats">📊 Statistika</button>
         <button class="tab-btn active" data-tab="words">📖 Sözlər</button>
-        <button class="tab-btn" data-tab="levels">📊 Səviyyələr</button>
         <button class="tab-btn" data-tab="categories">🏷️ Kateqoriyalar</button>
         <button class="tab-btn" data-tab="settings">⚙️ Parametrlər</button>
+    </div>
+
+    <!-- STATİSTİKA TABI -->
+    <div id="stats-tab" class="tab-content">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card" id="statTotalWords">
+                <i class="fas fa-book"></i>
+                <div class="stat-value" id="totalWords">0</div>
+                <div class="stat-label">Ümumi Sözlər</div>
+            </div>
+            <div class="stat-card" id="statTotalCategories">
+                <i class="fas fa-tags"></i>
+                <div class="stat-value" id="totalCategories">0</div>
+                <div class="stat-label">Kateqoriyalar</div>
+            </div>
+            <div class="stat-card" id="statTopCategory">
+                <i class="fas fa-crown"></i>
+                <div class="stat-value" id="topCategory">-</div>
+                <div class="stat-label">Ən çox söz olan</div>
+            </div>
+            <div class="stat-card" id="statAvgWords">
+                <i class="fas fa-chart-line"></i>
+                <div class="stat-value" id="avgPerCategory">0</div>
+                <div class="stat-label">Orta (hər kateqoriyada)</div>
+            </div>
+            <div class="stat-card" id="statLongestWord">
+                <i class="fas fa-text-height"></i>
+                <div class="stat-value" id="longestWord">-</div>
+                <div class="stat-label">Ən uzun söz</div>
+            </div>
+            <div class="stat-card" id="statShortestWord">
+                <i class="fas fa-text-width"></i>
+                <div class="stat-value" id="shortestWord">-</div>
+                <div class="stat-label">Ən qısa söz</div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h4><i class="fas fa-chart-bar" style="color: #f5a623;"></i> Kateqoriyalara görə sözlər (Top 15)</h4>
+            <canvas id="categoriesBarChart" width="400" height="280"></canvas>
+        </div>
+
+        <div class="grid-2">
+            <div class="stat-detail-card">
+                <div class="stat-detail-title"><i class="fas fa-arrow-up" style="color: #28a745;"></i> Ən çox söz olan kateqoriyalar (Top 5)</div>
+                <div class="stat-list" id="topCategoriesList"></div>
+            </div>
+            <div class="stat-detail-card">
+                <div class="stat-detail-title"><i class="fas fa-arrow-down" style="color: #dc3545;"></i> Ən az söz olan kateqoriyalar (Bottom 5)</div>
+                <div class="stat-list" id="bottomCategoriesList"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Sözlər Tabı -->
@@ -398,64 +555,95 @@
                 <div class="grid-2"><input type="text" id="zh" placeholder="你好"><input type="text" id="zh_read" placeholder="ni hao"></div>
             </div>
             
-            <!-- Səviyyə və Kateqoriya - Mobil: Dropdown, Kompüter: Buton -->
-            <div class="filter-title">📚 Səviyyə</div>
-            
-            <!-- Mobil üçün Dropdown -->
-            <div class="level-dropdown">
-                <select id="level_select_mobile"></select>
+            <div class="form-group">
+                <label>🏷️ Kateqoriya</label>
+                <select id="category_select"></select>
             </div>
             
-            <!-- Kompüter üçün Butonlar -->
-            <div class="level-buttons" id="level_buttons"></div>
-            
-            <div class="filter-title">🏷️ Kateqoriya</div>
-            
-            <!-- Mobil üçün Dropdown -->
-            <div class="category-dropdown">
-                <select id="category_select_mobile"></select>
-            </div>
-            
-            <!-- Kompüter üçün Butonlar -->
-            <div class="category-buttons" id="category_buttons"></div>
-            
-            <button class="btn btn-primary" id="addWordBtn" style="margin-top: 16px;"><i class="fas fa-save"></i> Sözü Yadda Saxla</button>
-            <div class="info-text">Səviyyə seçilməzsə "Başlanğıc", Kateqoriya seçilməzsə "Əsas" olacaq</div>
+            <button class="btn btn-primary" id="addWordBtn"><i class="fas fa-save"></i> Sözü Yadda Saxla</button>
         </div>
         
         <div class="card">
-            <h3>📋 Sözlər Siyahısı</h3>
-            <div class="form-group"><input type="text" id="searchWord" placeholder="🔍 Axtar..."></div>
+            <h3><i class="fas fa-filter"></i> Kateqoriyaya görə filtr</h3>
+            <div class="filter-bar">
+                <div class="filter-select">
+                    <select id="categoryFilterSelect">
+                        <option value="all">📌 Bütün kateqoriyalar</option>
+                    </select>
+                </div>
+                <button class="btn btn-sm" id="clearFilterBtn" style="background:#e2e8f0"><i class="fas fa-times"></i> Təmizlə</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3><i class="fas fa-arrows-alt"></i> Sözlər Siyahısı (Sürüşdürərək sıralama dəyişin)</h3>
+            <div class="grid-2" style="margin-bottom: 16px;">
+                <div class="form-group"><input type="text" id="searchWord" placeholder="🔍 Axtar..."></div>
+                <button class="btn btn-danger" id="deleteAllWordsBtn" style="background: linear-gradient(135deg, #dc3545, #c82333);"><i class="fas fa-trash-alt"></i> Bütün Sözləri Sil</button>
+            </div>
             <div class="word-count" id="wordCount">0 söz</div>
-            <div class="table-wrapper"><div id="wordsList"></div></div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th style="width:30px"></th><th>#</th><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
+                    <tbody id="wordsList"></tbody>
+                </table>
+            </div>
             <div id="pagination" class="pagination"></div>
-        </div>
-    </div>
-
-    <!-- Səviyyələr Tabı -->
-    <div id="levels-tab" class="tab-content">
-        <div class="card">
-            <h3>➕ Yeni Səviyyə</h3>
-            <input type="text" id="newLevel" placeholder="Səviyyə adı">
-            <button class="btn btn-primary" id="addLevelBtn" style="margin-top: 10px;">Əlavə Et</button>
-        </div>
-        <div class="card">
-            <h3>📊 Səviyyələr Siyahısı</h3>
-            <div id="levelsList"></div>
         </div>
     </div>
 
     <!-- Kateqoriyalar Tabı -->
     <div id="categories-tab" class="tab-content">
-        <div class="card">
-            <h3>➕ Yeni Kateqoriya</h3>
-            <input type="text" id="newCategory" placeholder="Kateqoriya adı">
-            <button class="btn btn-primary" id="addCategoryBtn" style="margin-top: 10px;">Əlavə Et</button>
+        <!-- BÜTÜN SÖZLƏRİ SİL BÖLMƏSİ -->
+        <div class="delete-all-section">
+            <h4><i class="fas fa-exclamation-triangle"></i> ⚠️ Təhlükəli Əməliyyat</h4>
+            <p style="margin-bottom: 16px; font-size: 14px;">Bütün sözləri birdən silmək istəyirsinizsə, aşağıdakı düyməni istifadə edin. Bu əməliyyat geri alına bilməz!</p>
+            <button class="btn btn-danger" id="deleteAllWordsCategoryBtn" style="width: auto; padding: 12px 30px;"><i class="fas fa-trash-alt"></i> 🗑️ BÜTÜN SÖZLƏRİ SİL</button>
         </div>
+        
+        <!-- KATEQORİYA SEÇİB SİLMƏ BÖLMƏSİ -->
+        <div class="delete-category-section">
+            <h4><i class="fas fa-folder-open"></i> Kateqoriya Seçərək Toplu Silmə</h4>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>🗑️ Silinəcək Kateqoriyanı Seçin</label>
+                    <select id="deleteCategorySelect">
+                        <option value="">Kateqoriya seçin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-warning" id="deleteSelectedCategoryBtn" style="width: 100%;"><i class="fas fa-trash"></i> Seçilmiş Kateqoriyadakı Sözləri Sil</button>
+                </div>
+            </div>
+            <div class="info-text"><i class="fas fa-info-circle"></i> Bu əməliyyat seçdiyiniz kateqoriyadakı BÜTÜN sözləri siləcək!</div>
+        </div>
+        
+        <!-- KATEQORİYA ADINI DƏYİŞMƏ BÖLMƏSİ -->
         <div class="card">
-            <h3>🏷️ Kateqoriyalar Siyahısı</h3>
+            <h3>✏️ Kateqoriya Adını Dəyiş</h3>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Köhnə Kateqoriya</label>
+                    <select id="oldCategorySelect"></select>
+                </div>
+                <div class="form-group">
+                    <label>Yeni Kateqoriya Adı</label>
+                    <input type="text" id="newCategoryName" placeholder="Yeni kateqoriya adı">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="updateCategoryBtn"><i class="fas fa-save"></i> Kateqoriyanı Yenilə</button>
+        </div>
+        
+        <div class="card">
+            <h3><i class="fas fa-table"></i> Kateqoriyalar Cədvəli</h3>
             <div class="word-count" id="categoryCount">0 kateqoriya</div>
-            <div id="categoriesList"></div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>#</th><th>Kateqoriya Adı</th><th>Söz Sayı</th><th>Faiz</th></tr></thead>
+                    <tbody id="categoriesList"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -481,46 +669,52 @@
 </div>
 
 <div class="theme-toggle" id="themeToggle">🌙</div>
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast"><i class="fas fa-check-circle"></i> <span id="toastMessage"></span></div>
 
+<!-- Redaktə Modalı -->
 <div id="editModal" class="modal-overlay">
     <div class="modal-content">
-        <h3>✏️ Sözü Redaktə Et</h3>
+        <h3>✏️ Sözü Redaktə Et (Bütün dillər)</h3>
         <div id="editForm"></div>
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
             <button class="btn btn-primary btn-sm" id="saveEditBtn">Yadda Saxla</button>
             <button class="btn btn-sm" id="closeModalBtn">Bağla</button>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     (function() {
         const SUPABASE_URL = "https://icwpaipqqqwjpooazmcu.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_W5rnAxonO_Sq-EnCdlFU7Q_mkmi37yJ";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        let allWords = [], levels = [], categories = [];
+        let allWords = [], categories = [], categoryStats = [];
         let currentPage = 1;
-        let selectedLevel = "all";
-        let selectedCategory = "all";
+        let searchQuery = "";
+        let selectedCategoryFilter = "all";
         const itemsPerPage = 20;
         let currentEditId = null;
         let validCodes = ['12345', 'admin123'];
-
+        let sortableInstance = null;
+        let barChart = null;
+        
+        // Toast
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
-            toast.textContent = msg;
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = msg;
             toast.className = 'toast' + (isError ? ' error' : '');
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3000);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
         }
-
+        
         function escapeHtml(str) {
             if (!str) return '';
             return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
         }
-
+        
         // Giriş
         async function checkLogin() {
             try {
@@ -534,7 +728,7 @@
                 }
             } catch(e) { console.error(e); }
         }
-
+        
         document.getElementById('loginBtn').onclick = async () => {
             const enteredCode = document.getElementById('loginCode').value;
             const errorDiv = document.getElementById('loginError');
@@ -551,15 +745,15 @@
             }
         };
         document.getElementById('loginCode').onkeypress = (e) => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); };
-
+        
         async function loadAll() {
             await loadWords();
-            await loadLevels();
             await loadCategories();
             await loadSettings();
+            await updateStatistics();
             initTabs();
         }
-
+        
         function initTabs() {
             const btns = document.querySelectorAll('.tab-btn');
             const contents = document.querySelectorAll('.tab-content');
@@ -573,81 +767,239 @@
                 };
             });
         }
-
-        // Sözlər (filter ilə)
-        async function loadWords(search = '') {
-            let query = supabaseClient.from('words').select('*').order('id', { ascending: true });
-            if (search) query = query.ilike('az', `%${search}%`);
-            if (selectedLevel !== "all") query = query.eq('level', selectedLevel);
-            if (selectedCategory !== "all") query = query.eq('category', selectedCategory);
-            const { data } = await query;
-            allWords = data || [];
-            document.getElementById('wordCount').innerText = allWords.length + ' söz';
-            renderWords();
+        
+        // STATİSTİKA
+        async function updateStatistics() {
+            const totalWords = allWords.length;
+            const categoryMap = new Map();
+            let longestWord = { word: '', length: 0 };
+            let shortestWord = { word: '', length: Infinity };
+            
+            allWords.forEach(w => {
+                const cat = w.category || 'Əsas';
+                categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+                
+                if (w.az && w.az.length > longestWord.length) {
+                    longestWord = { word: w.az, length: w.az.length };
+                }
+                if (w.az && w.az.length < shortestWord.length) {
+                    shortestWord = { word: w.az, length: w.az.length };
+                }
+            });
+            
+            const uniqueCategories = [...categoryMap.keys()];
+            const totalCategories = uniqueCategories.length;
+            
+            let topCategory = '-';
+            let topCount = 0;
+            for (const [cat, count] of categoryMap) {
+                if (count > topCount) { topCount = count; topCategory = cat; }
+            }
+            const avgPerCategory = totalCategories > 0 ? Math.round(totalWords / totalCategories) : 0;
+            
+            animateValue('totalWords', 0, totalWords, 800);
+            animateValue('totalCategories', 0, totalCategories, 800);
+            animateValue('avgPerCategory', 0, avgPerCategory, 800);
+            document.getElementById('topCategory').innerHTML = `<span class="animate-pulse">${escapeHtml(topCategory)}</span>`;
+            document.getElementById('longestWord').innerHTML = longestWord.word || '-';
+            document.getElementById('shortestWord').innerHTML = shortestWord.word || '-';
+            
+            updateBarChart(categoryMap);
+            updateTopBottomLists(categoryMap);
         }
-
+        
+        function animateValue(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            const range = end - start;
+            const startTime = performance.now();
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const value = Math.floor(start + (range * progress));
+                element.textContent = value;
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+        
+        function updateBarChart(categoryMap) {
+            const sorted = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
+            const labels = sorted.map(c => c[0].length > 15 ? c[0].substring(0, 12) + '...' : c[0]);
+            const data = sorted.map(c => c[1]);
+            
+            if (barChart) barChart.destroy();
+            const ctx = document.getElementById('categoriesBarChart').getContext('2d');
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Söz sayı',
+                        data: data,
+                        backgroundColor: 'rgba(245, 166, 35, 0.7)',
+                        borderColor: '#f5a623',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#e2e8f0' }, title: { display: true, text: 'Söz sayı' } } }
+                }
+            });
+        }
+        
+        function updateTopBottomLists(categoryMap) {
+            const sorted = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
+            const top5 = sorted.slice(0, 5);
+            const bottom5 = sorted.slice(-5).reverse();
+            
+            const topContainer = document.getElementById('topCategoriesList');
+            const bottomContainer = document.getElementById('bottomCategoriesList');
+            
+            if (topContainer) {
+                topContainer.innerHTML = top5.map(([cat, count]) => `
+                    <div class="stat-list-item">
+                        <span class="stat-list-label">${escapeHtml(cat)}</span>
+                        <span class="stat-list-value" style="color:#28a745">${count} söz</span>
+                    </div>
+                `).join('');
+            }
+            if (bottomContainer) {
+                bottomContainer.innerHTML = bottom5.map(([cat, count]) => `
+                    <div class="stat-list-item">
+                        <span class="stat-list-label">${escapeHtml(cat)}</span>
+                        <span class="stat-list-value" style="color:#dc3545">${count} söz</span>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // SÖZLƏR
+        async function loadWords() {
+            try {
+                let query = supabaseClient.from('words').select('*');
+                if (searchQuery) query = query.ilike('az', `%${searchQuery}%`);
+                if (selectedCategoryFilter !== "all") query = query.eq('category', selectedCategoryFilter);
+                const { data, error } = await query;
+                if (error) throw error;
+                allWords = data || [];
+                
+                const savedOrder = localStorage.getItem('word_order');
+                if (savedOrder) {
+                    const orderIds = JSON.parse(savedOrder);
+                    allWords.sort((a, b) => {
+                        const indexA = orderIds.indexOf(a.id);
+                        const indexB = orderIds.indexOf(b.id);
+                        if (indexA === -1) return 1;
+                        if (indexB === -1) return -1;
+                        return indexA - indexB;
+                    });
+                } else {
+                    allWords.sort((a, b) => a.id - b.id);
+                }
+                
+                document.getElementById('wordCount').innerText = allWords.length + ' söz';
+                renderWords();
+                await updateStatistics();
+                await loadCategories();
+            } catch(e) { console.error(e); }
+        }
+        
         function renderWords() {
+            const totalPages = Math.ceil(allWords.length / itemsPerPage);
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
             const start = (currentPage - 1) * itemsPerPage;
             const pageWords = allWords.slice(start, start + itemsPerPage);
             const container = document.getElementById('wordsList');
             if (!container) return;
             
             if (pageWords.length === 0) {
-                container.innerHTML = '<p style="text-align:center;padding:20px">📭 Heç bir söz yoxdur</p>';
+                container.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px">📭 Heç bir söz yoxdur</td></tr>';
+                document.getElementById('pagination').innerHTML = '';
                 return;
             }
             
-            let html = `<table><thead><tr><th>#</th><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead><tbody>`;
+            container.innerHTML = '';
             pageWords.forEach((w, idx) => {
-                html += `<tr>
+                const row = document.createElement('tr');
+                row.className = 'sortable-row';
+                row.setAttribute('data-id', w.id);
+                row.innerHTML = `
+                    <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
                     <td>${start + idx + 1}</td>
                     <td><span class="category-badge">${w.id}</span></td>
                     <td><strong>${escapeHtml(w.az)}</strong></td>
                     <td>${escapeHtml(w.en)}</td>
-                    <td><span class="category-badge">${escapeHtml(w.level || 'Başlanğıc')}</span></td>
                     <td><span class="category-badge">${escapeHtml(w.category || 'Əsas')}</span></td>
                     <td class="action-icons">
                         <i class="fas fa-edit" onclick="window.editWord(${w.id})"></i>
                         <i class="fas fa-trash" onclick="window.deleteWord(${w.id})"></i>
                     </td>
-                <tr>`;
+                `;
+                container.appendChild(row);
             });
-            html += `</tbody> licensierad`;
-            container.innerHTML = html;
             
-            const totalPages = Math.ceil(allWords.length / itemsPerPage);
+            if (sortableInstance) sortableInstance.destroy();
+            sortableInstance = new Sortable(container, {
+                animation: 300,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                onEnd: async function() {
+                    const rows = document.querySelectorAll('#wordsList .sortable-row');
+                    const newOrder = [];
+                    rows.forEach(row => newOrder.push(parseInt(row.getAttribute('data-id'))));
+                    localStorage.setItem('word_order', JSON.stringify(newOrder));
+                    const sortedWords = [];
+                    for (const id of newOrder) {
+                        const word = allWords.find(w => w.id === id);
+                        if (word) sortedWords.push(word);
+                    }
+                    allWords = sortedWords;
+                    renderWords();
+                    showToast('✅ Sıralama yeniləndi!');
+                }
+            });
+            
             const paginationDiv = document.getElementById('pagination');
             if (paginationDiv) {
                 paginationDiv.innerHTML = '';
-                for (let i = 1; i <= Math.min(totalPages, 8); i++) {
+                const prevBtn = document.createElement('button');
+                prevBtn.textContent = '←';
+                prevBtn.className = 'page-btn';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderWords(); } };
+                paginationDiv.appendChild(prevBtn);
+                
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(totalPages, startPage + 4);
+                for (let i = startPage; i <= endPage; i++) {
                     const btn = document.createElement('button');
                     btn.textContent = i;
                     btn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
                     btn.onclick = () => { currentPage = i; renderWords(); };
                     paginationDiv.appendChild(btn);
                 }
+                
+                const nextBtn = document.createElement('button');
+                nextBtn.textContent = '→';
+                nextBtn.className = 'page-btn';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; renderWords(); } };
+                paginationDiv.appendChild(nextBtn);
             }
         }
-
-        // Söz əlavə et
+        
         window.addWord = async function() {
             const az = document.getElementById('az').value.trim();
             const en = document.getElementById('en').value.trim();
             if (!az || !en) { showToast('Azərbaycanca və İngiliscə daxil edin!', true); return; }
             
-            // Ekran ölçüsünə görə hansı select-in istifadə olunduğunu yoxla
-            const isMobile = window.innerWidth <= 768;
-            let levelValue, categoryValue;
-            
-            if (isMobile) {
-                levelValue = document.getElementById('level_select_mobile').value;
-                categoryValue = document.getElementById('category_select_mobile').value;
-            } else {
-                levelValue = selectedLevel === "all" ? '' : selectedLevel;
-                categoryValue = selectedCategory === "all" ? '' : selectedCategory;
-            }
-            
-            if (!levelValue) levelValue = 'Başlanğıc';
+            let categoryValue = document.getElementById('category_select').value;
             if (!categoryValue) categoryValue = 'Əsas';
             
             const newWord = {
@@ -665,7 +1017,6 @@
                 tr_read: document.getElementById('tr_read').value || null,
                 zh: document.getElementById('zh').value || null,
                 zh_read: document.getElementById('zh_read').value || null,
-                level: levelValue,
                 category: categoryValue,
                 created_at: new Date()
             };
@@ -681,199 +1032,126 @@
             await loadWords();
             await loadCategories();
         };
-
+        
         window.deleteWord = async function(id) {
             if (!confirm('Bu sözü silmək?')) return;
             await supabaseClient.from('words').delete().eq('id', id);
             await loadWords();
+            await loadCategories();
             showToast('✅ Söz silindi!');
         };
-
+        
+        // BÜTÜN SÖZLƏRİ SİL
+        async function deleteAllWords() {
+            if (!confirm('⚠️ BÜTÜN SÖZLƏRİ silmək istədiyinizdən əminsiniz? Bu əməliyyat geri alına bilməz!')) return;
+            const { error } = await supabaseClient.from('words').delete().neq('id', 0);
+            if (error) { showToast('Xəta: ' + error.message, true); return; }
+            localStorage.removeItem('word_order');
+            await loadWords();
+            await loadCategories();
+            showToast('✅ Bütün sözlər silindi!');
+        }
+        
+        document.getElementById('deleteAllWordsBtn')?.addEventListener('click', deleteAllWords);
+        document.getElementById('deleteAllWordsCategoryBtn')?.addEventListener('click', deleteAllWords);
+        
+        // KATEQORİYA SEÇİB SİL
+        async function deleteSelectedCategory() {
+            const category = document.getElementById('deleteCategorySelect').value;
+            if (!category) { showToast('Kateqoriya seçin!', true); return; }
+            const wordCount = allWords.filter(w => w.category === category).length;
+            if (!confirm(`⚠️ "${category}" kateqoriyasındaki ${wordCount} sözü silmək istədiyinizdən əminsiniz?`)) return;
+            const { error } = await supabaseClient.from('words').delete().eq('category', category);
+            if (error) { showToast('Xəta: ' + error.message, true); return; }
+            await loadWords();
+            await loadCategories();
+            showToast(`✅ "${category}" kateqoriyasındaki bütün sözlər silindi!`);
+        }
+        
+        document.getElementById('deleteSelectedCategoryBtn')?.addEventListener('click', deleteSelectedCategory);
+        
         window.editWord = async function(id) {
             const word = allWords.find(w => w.id === id);
             if (!word) return;
             currentEditId = id;
-            
             document.getElementById('editForm').innerHTML = `
                 <div class="form-group"><label>🔢 ID</label><input type="number" id="edit_id" value="${word.id}"></div>
-                <div class="form-group"><label>🇦🇿 Azərbaycanca</label><input type="text" id="edit_az" value="${escapeHtml(word.az)}"></div>
-                <div class="form-group"><label>🇬🇧 İngiliscə</label><input type="text" id="edit_en" value="${escapeHtml(word.en)}"></div>
-                <div class="form-group"><label>🔊 Oxunuş</label><input type="text" id="edit_en_read" value="${escapeHtml(word.en_read || '')}"></div>
-                <div class="form-group"><label>🇷🇺 Rusca</label><input type="text" id="edit_ru" value="${escapeHtml(word.ru || '')}"></div>
-                <div class="form-group"><label>🇩🇪 Almanca</label><input type="text" id="edit_de" value="${escapeHtml(word.de || '')}"></div>
-                <div class="form-group"><label>🇪🇸 İspanca</label><input type="text" id="edit_es" value="${escapeHtml(word.es || '')}"></div>
-                <div class="form-group"><label>🇵🇹 Portuqalca</label><input type="text" id="edit_pt" value="${escapeHtml(word.pt || '')}"></div>
-                <div class="form-group"><label>🇹🇷 Türkcə</label><input type="text" id="edit_tr" value="${escapeHtml(word.tr || '')}"></div>
-                <div class="form-group"><label>🇨🇳 Çincə</label><input type="text" id="edit_zh" value="${escapeHtml(word.zh || '')}"></div>
-                <div class="grid-2">
-                    <div class="form-group"><label>Səviyyə</label><select id="edit_level">${levels.map(l => `<option value="${l.name}" ${word.level === l.name ? 'selected' : ''}>${l.name}</option>`).join('')}<option value="Başlanğıc" ${word.level === 'Başlanğıc' ? 'selected' : ''}>Başlanğıc</option></select></div>
-                    <div class="form-group"><label>Kateqoriya</label><select id="edit_category"><option value="Əsas" ${word.category === 'Əsas' ? 'selected' : ''}>Əsas</option>${categories.map(c => `<option value="${c.name}" ${word.category === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div>
-                </div>
+                <div class="lang-section"><div class="lang-title">🇦🇿 Azərbaycanca</div><input type="text" id="edit_az" value="${escapeHtml(word.az)}"></div>
+                <div class="lang-section"><div class="lang-title">🇬🇧 İngiliscə</div><input type="text" id="edit_en" value="${escapeHtml(word.en)}"><div class="lang-title" style="margin-top:8px">🔊 Oxunuş</div><input type="text" id="edit_en_read" value="${escapeHtml(word.en_read || '')}"></div>
+                <div class="lang-section"><div class="lang-title">🇷🇺 Rusca</div><div class="grid-2"><input type="text" id="edit_ru" placeholder="Tərcümə" value="${escapeHtml(word.ru || '')}"><input type="text" id="edit_ru_read" placeholder="Oxunuş" value="${escapeHtml(word.ru_read || '')}"></div></div>
+                <div class="lang-section"><div class="lang-title">🇩🇪 Almanca</div><div class="grid-2"><input type="text" id="edit_de" placeholder="Tərcümə" value="${escapeHtml(word.de || '')}"><input type="text" id="edit_de_read" placeholder="Oxunuş" value="${escapeHtml(word.de_read || '')}"></div></div>
+                <div class="lang-section"><div class="lang-title">🇪🇸 İspanca</div><div class="grid-2"><input type="text" id="edit_es" placeholder="Tərcümə" value="${escapeHtml(word.es || '')}"><input type="text" id="edit_es_read" placeholder="Oxunuş" value="${escapeHtml(word.es_read || '')}"></div></div>
+                <div class="lang-section"><div class="lang-title">🇵🇹 Portuqalca</div><div class="grid-2"><input type="text" id="edit_pt" placeholder="Tərcümə" value="${escapeHtml(word.pt || '')}"><input type="text" id="edit_pt_read" placeholder="Oxunuş" value="${escapeHtml(word.pt_read || '')}"></div></div>
+                <div class="lang-section"><div class="lang-title">🇹🇷 Türkcə</div><div class="grid-2"><input type="text" id="edit_tr" placeholder="Tərcümə" value="${escapeHtml(word.tr || '')}"><input type="text" id="edit_tr_read" placeholder="Oxunuş" value="${escapeHtml(word.tr_read || '')}"></div></div>
+                <div class="lang-section"><div class="lang-title">🇨🇳 Çincə</div><div class="grid-2"><input type="text" id="edit_zh" placeholder="Tərcümə" value="${escapeHtml(word.zh || '')}"><input type="text" id="edit_zh_read" placeholder="Oxunuş" value="${escapeHtml(word.zh_read || '')}"></div></div>
+                <div class="form-group"><label>🏷️ Kateqoriya</label><select id="edit_category">${categories.map(c => `<option value="${escapeHtml(c)}" ${word.category === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}<option value="Əsas" ${word.category === 'Əsas' ? 'selected' : ''}>Əsas</option></select></div>
             `;
             document.getElementById('editModal').classList.add('active');
         };
-
-        // Səviyyələr
-        async function loadLevels() {
-            const { data } = await supabaseClient.from('levels').select('*').order('display_order');
-            levels = data || [];
-            const container = document.getElementById('levelsList');
-            if (container) {
-                if (levels.length === 0) container.innerHTML = '<p>Heç bir səviyyə yoxdur</p>';
-                else {
-                    let html = '';
-                    levels.forEach((l, idx) => {
-                        html += `<div class="list-item">
-                            <div class="list-item-name"><span class="order-number">${idx + 1}</span> ${escapeHtml(l.name)}</div>
-                            <div class="list-item-actions"><i class="fas fa-trash" onclick="deleteLevel(${l.id})" style="color:#dc3545"></i></div>
-                        </div>`;
-                    });
-                    container.innerHTML = html;
-                }
-            }
-            
-            // Həm mobil dropdown, həm də kompüter butonlarını doldur
-            const levelSelectMobile = document.getElementById('level_select_mobile');
-            const levelButtons = document.getElementById('level_buttons');
-            
-            if (levelSelectMobile) {
-                let options = '<option value="all">Bütün səviyyələr</option>';
-                levels.forEach(l => { options += `<option value="${escapeHtml(l.name)}">${escapeHtml(l.name)}</option>`; });
-                options += '<option value="Başlanğıc">Başlanğıc</option>';
-                levelSelectMobile.innerHTML = options;
-                levelSelectMobile.value = selectedLevel;
-                levelSelectMobile.onchange = (e) => { selectedLevel = e.target.value; currentPage = 1; loadWords(); };
-            }
-            
-            if (levelButtons) {
-                let buttons = `<button class="filter-btn ${selectedLevel === "all" ? "active" : ""}" data-level="all">Bütün</button>`;
-                levels.forEach(l => {
-                    buttons += `<button class="filter-btn ${selectedLevel === l.name ? "active" : ""}" data-level="${escapeHtml(l.name)}">${escapeHtml(l.name)}</button>`;
-                });
-                buttons += `<button class="filter-btn ${selectedLevel === "Başlanğıc" ? "active" : ""}" data-level="Başlanğıc">Başlanğıc</button>`;
-                levelButtons.innerHTML = buttons;
-                
-                levelButtons.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        selectedLevel = btn.dataset.level;
-                        currentPage = 1;
-                        loadWords();
-                        updateLevelButtons();
-                    };
-                });
-            }
-        }
         
-        function updateLevelButtons() {
-            document.querySelectorAll('#level_buttons .filter-btn').forEach(btn => {
-                if (btn.dataset.level === selectedLevel) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-        }
-
-        window.addLevel = async function() {
-            const name = document.getElementById('newLevel').value.trim();
-            if (!name) { showToast('Səviyyə adı daxil edin!', true); return; }
-            await supabaseClient.from('levels').insert([{ name, display_order: levels.length + 1 }]);
-            document.getElementById('newLevel').value = '';
-            await loadLevels();
-            showToast('✅ Səviyyə əlavə edildi!');
-        };
-
-        window.deleteLevel = async function(id) {
-            if (!confirm('Səviyyəni silmək?')) return;
-            await supabaseClient.from('levels').delete().eq('id', id);
-            await loadLevels();
-            showToast('✅ Səviyyə silindi!');
-        };
-
-        // Kateqoriyalar
+        // KATEQORİYALAR
         async function loadCategories() {
             try {
-                const { data, error } = await supabaseClient.from('categories').select('*').order('display_order');
-                if (error) throw error;
-                categories = data || [];
+                const categoryMap = new Map();
+                allWords.forEach(w => {
+                    const cat = w.category || 'Əsas';
+                    categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+                });
+                categoryStats = Array.from(categoryMap.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+                categories = categoryStats.map(c => c.name);
                 
                 const container = document.getElementById('categoriesList');
+                const total = categoryStats.reduce((sum, c) => sum + c.count, 0);
                 if (container) {
-                    if (categories.length === 0) {
-                        container.innerHTML = '<p>Heç bir kateqoriya yoxdur</p>';
+                    if (categoryStats.length === 0) {
+                        container.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px">📭 Heç bir kateqoriya yoxdur</td></tr>';
                         document.getElementById('categoryCount').innerText = '0 kateqoriya';
                     } else {
                         let html = '';
-                        categories.forEach((c, idx) => {
-                            html += `<div class="list-item">
-                                <div class="list-item-name"><span class="order-number">${idx + 1}</span> ${escapeHtml(c.name)}</div>
-                                <div class="list-item-actions"><i class="fas fa-trash" onclick="deleteCategory(${c.id}, '${escapeHtml(c.name)}')" style="color:#dc3545"></i></div>
-                            </div>`;
+                        categoryStats.forEach((cat, idx) => {
+                            const percent = total > 0 ? ((cat.count / total) * 100).toFixed(1) : 0;
+                            html += `<tr><td style="width:50px">${idx + 1}</td><td><span class="category-badge">${escapeHtml(cat.name)}</span></td><td style="width:80px">${cat.count}</td><td style="width:120px">${percent}%<div class="progress-bar"><div class="progress-fill" style="width: ${percent}%"></div></div></td></tr>`;
                         });
                         container.innerHTML = html;
-                        document.getElementById('categoryCount').innerText = categories.length + ' kateqoriya';
+                        document.getElementById('categoryCount').innerText = categoryStats.length + ' kateqoriya';
                     }
                 }
                 
-                // Həm mobil dropdown, həm də kompüter butonlarını doldur
-                const categorySelectMobile = document.getElementById('category_select_mobile');
-                const categoryButtons = document.getElementById('category_buttons');
-                
-                if (categorySelectMobile) {
-                    let options = '<option value="all">Bütün kateqoriyalar</option>';
-                    categories.forEach(c => { options += `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`; });
-                    options += '<option value="Əsas">Əsas</option>';
-                    categorySelectMobile.innerHTML = options;
-                    categorySelectMobile.value = selectedCategory;
-                    categorySelectMobile.onchange = (e) => { selectedCategory = e.target.value; currentPage = 1; loadWords(); };
-                }
-                
-                if (categoryButtons) {
-                    let buttons = `<button class="filter-btn ${selectedCategory === "all" ? "active" : ""}" data-category="all">Bütün</button>`;
-                    categories.forEach(c => {
-                        buttons += `<button class="filter-btn ${selectedCategory === c.name ? "active" : ""}" data-category="${escapeHtml(c.name)}">${escapeHtml(c.name)}</button>`;
-                    });
-                    buttons += `<button class="filter-btn ${selectedCategory === "Əsas" ? "active" : ""}" data-category="Əsas">Əsas</button>`;
-                    categoryButtons.innerHTML = buttons;
-                    
-                    categoryButtons.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.onclick = () => {
-                            selectedCategory = btn.dataset.category;
-                            currentPage = 1;
-                            loadWords();
-                            updateCategoryButtons();
-                        };
-                    });
-                }
-            } catch(e) {
-                console.error('Kateqoriya xətası:', e);
-            }
+                const selects = ['category_select', 'oldCategorySelect', 'deleteCategorySelect', 'categoryFilterSelect'];
+                selects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    if (select) {
+                        let options = selectId === 'categoryFilterSelect' ? '<option value="all">📌 Bütün kateqoriyalar</option>' : '<option value="">Kateqoriya seçin</option>';
+                        categories.forEach(c => { options += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`; });
+                        if (selectId !== 'categoryFilterSelect') options += '<option value="Əsas">Əsas</option>';
+                        if (selectId === 'categoryFilterSelect') options += '<option value="Əsas">Əsas</option>';
+                        select.innerHTML = options;
+                        if (selectId === 'categoryFilterSelect') select.value = selectedCategoryFilter;
+                    }
+                });
+            } catch(e) { console.error(e); }
         }
         
-        function updateCategoryButtons() {
-            document.querySelectorAll('#category_buttons .filter-btn').forEach(btn => {
-                if (btn.dataset.category === selectedCategory) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-        }
-
-        window.addCategory = async function() {
-            const name = document.getElementById('newCategory').value.trim();
-            if (!name) { showToast('Kateqoriya adı daxil edin!', true); return; }
-            const { error } = await supabaseClient.from('categories').insert([{ name, display_order: categories.length + 1 }]);
+        window.updateCategory = async function() {
+            const oldCategory = document.getElementById('oldCategorySelect').value;
+            const newCategory = document.getElementById('newCategoryName').value.trim();
+            if (!oldCategory) { showToast('Köhnə kateqoriya seçin!', true); return; }
+            if (!newCategory) { showToast('Yeni kateqoriya adı daxil edin!', true); return; }
+            if (oldCategory === newCategory) { showToast('Eyni ad!', true); return; }
+            if (!confirm(`"${oldCategory}" -> "${newCategory}" olaraq dəyişsin?`)) return;
+            const { error } = await supabaseClient.from('words').update({ category: newCategory }).eq('category', oldCategory);
             if (error) { showToast('Xəta: ' + error.message, true); return; }
-            document.getElementById('newCategory').value = '';
-            await loadCategories();
-            showToast('✅ Kateqoriya əlavə edildi!');
-        };
-
-        window.deleteCategory = async function(id, name) {
-            if (!confirm(`"${name}" kateqoriyasını silmək?`)) return;
-            await supabaseClient.from('categories').delete().eq('id', id);
-            await supabaseClient.from('words').update({ category: 'Əsas' }).eq('category', name);
-            await loadCategories();
+            showToast(`✅ "${oldCategory}" -> "${newCategory}" dəyişdirildi!`);
+            document.getElementById('newCategoryName').value = '';
             await loadWords();
-            showToast('✅ Kateqoriya silindi!');
+            await loadCategories();
         };
-
-        // Parametrlər
+        
+        document.getElementById('updateCategoryBtn').onclick = () => window.updateCategory();
+        document.getElementById('categoryFilterSelect').onchange = (e) => { selectedCategoryFilter = e.target.value; currentPage = 1; loadWords(); };
+        document.getElementById('clearFilterBtn').onclick = () => { document.getElementById('categoryFilterSelect').value = 'all'; selectedCategoryFilter = 'all'; currentPage = 1; loadWords(); };
+        
+        // PARAMETRLƏR
         async function loadSettings() {
             const { data } = await supabaseClient.from('site_settings').select('*').limit(1);
             if (data && data[0]) {
@@ -887,7 +1165,7 @@
                 if (data[0].admin_codes) document.getElementById('adminCodes').value = data[0].admin_codes.join(', ');
             }
         }
-
+        
         window.saveSettings = async function() {
             const { data: existing } = await supabaseClient.from('site_settings').select('id').limit(1);
             const adminCodesStr = document.getElementById('adminCodes').value;
@@ -903,25 +1181,19 @@
                 admin_codes: adminCodesArray,
                 updated_at: new Date()
             };
-            if (existing && existing[0]) {
-                await supabaseClient.from('site_settings').update(settingsData).eq('id', existing[0].id);
-            } else {
-                await supabaseClient.from('site_settings').insert([settingsData]);
-            }
+            if (existing && existing[0]) await supabaseClient.from('site_settings').update(settingsData).eq('id', existing[0].id);
+            else await supabaseClient.from('site_settings').insert([settingsData]);
             showToast('✅ Parametrlər yadda saxlandı!');
         };
-
-        // Event listenerlər
+        
         document.getElementById('addWordBtn').onclick = () => window.addWord();
-        document.getElementById('addLevelBtn').onclick = () => window.addLevel();
-        document.getElementById('addCategoryBtn').onclick = () => window.addCategory();
         document.getElementById('saveSettingsBtn').onclick = () => window.saveSettings();
         document.getElementById('closeModalBtn').onclick = () => document.getElementById('editModal').classList.remove('active');
         
         document.getElementById('saveEditBtn').onclick = async () => {
             const newId = parseInt(document.getElementById('edit_id').value);
             const oldId = currentEditId;
-            if (newId !== oldId) {
+            if (newId !== oldId && !isNaN(newId)) {
                 await supabaseClient.from('words').delete().eq('id', oldId);
                 await supabaseClient.from('words').insert([{
                     id: newId,
@@ -929,12 +1201,17 @@
                     en: document.getElementById('edit_en').value,
                     en_read: document.getElementById('edit_en_read').value,
                     ru: document.getElementById('edit_ru').value,
+                    ru_read: document.getElementById('edit_ru_read').value,
                     de: document.getElementById('edit_de').value,
+                    de_read: document.getElementById('edit_de_read').value,
                     es: document.getElementById('edit_es').value,
+                    es_read: document.getElementById('edit_es_read').value,
                     pt: document.getElementById('edit_pt').value,
+                    pt_read: document.getElementById('edit_pt_read').value,
                     tr: document.getElementById('edit_tr').value,
+                    tr_read: document.getElementById('edit_tr_read').value,
                     zh: document.getElementById('edit_zh').value,
-                    level: document.getElementById('edit_level').value,
+                    zh_read: document.getElementById('edit_zh_read').value,
                     category: document.getElementById('edit_category').value,
                     created_at: new Date()
                 }]);
@@ -945,43 +1222,36 @@
                     en: document.getElementById('edit_en').value,
                     en_read: document.getElementById('edit_en_read').value,
                     ru: document.getElementById('edit_ru').value,
+                    ru_read: document.getElementById('edit_ru_read').value,
                     de: document.getElementById('edit_de').value,
+                    de_read: document.getElementById('edit_de_read').value,
                     es: document.getElementById('edit_es').value,
+                    es_read: document.getElementById('edit_es_read').value,
                     pt: document.getElementById('edit_pt').value,
+                    pt_read: document.getElementById('edit_pt_read').value,
                     tr: document.getElementById('edit_tr').value,
+                    tr_read: document.getElementById('edit_tr_read').value,
                     zh: document.getElementById('edit_zh').value,
-                    level: document.getElementById('edit_level').value,
+                    zh_read: document.getElementById('edit_zh_read').value,
                     category: document.getElementById('edit_category').value
                 }).eq('id', oldId);
                 showToast('✅ Söz yeniləndi!');
             }
             document.getElementById('editModal').classList.remove('active');
             await loadWords();
+            await loadCategories();
         };
         
-        document.getElementById('searchWord').oninput = (e) => { currentPage = 1; loadWords(e.target.value); };
+        document.getElementById('searchWord').oninput = (e) => { searchQuery = e.target.value; currentPage = 1; loadWords(); };
         document.getElementById('viewSiteBtn').onclick = (e) => { e.preventDefault(); window.open('index.html', '_blank'); };
-
-        // Ekran ölçüsü dəyişdikdə
-        window.addEventListener('resize', () => {
-            // Seçilmiş dəyərləri sinxronizasiya et
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                const mobileLevel = document.getElementById('level_select_mobile');
-                const mobileCategory = document.getElementById('category_select_mobile');
-                if (mobileLevel) mobileLevel.value = selectedLevel;
-                if (mobileCategory) mobileCategory.value = selectedCategory;
-            }
-        });
-
-        // Qaranlıq rejim
+        
         const isDark = localStorage.getItem('adminDark') === 'true';
         if (isDark) document.body.classList.add('dark');
         document.getElementById('themeToggle').onclick = () => {
             document.body.classList.toggle('dark');
             localStorage.setItem('adminDark', document.body.classList.contains('dark'));
         };
-
+        
         checkLogin();
     })();
 </script>

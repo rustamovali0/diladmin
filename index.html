@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin Panel - Dil Öyrən</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -17,7 +17,6 @@
             --primary: #f5a623;
             --danger: #dc3545;
             --success: #28a745;
-            --warning: #ffc107;
             --border: #dee2e6;
         }
 
@@ -351,7 +350,6 @@
     let editType = null;
     let editId = null;
     let isConnected = false;
-    let isLoggedIn = false;
 
     async function checkAccessCode() {
         const savedCode = localStorage.getItem('admin_access_code');
@@ -370,7 +368,6 @@
             const validCode = data && data[0] ? data[0].access_code : 'admin123';
             if (code === validCode) {
                 localStorage.setItem('admin_access_code', code);
-                isLoggedIn = true;
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('adminContent').style.display = 'block';
                 await initAdmin();
@@ -465,6 +462,7 @@
 
     document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
 
+    // LEVELS
     async function loadLevels() {
         const { data } = await supabaseClient.from('levels').select('*').order('display_order');
         levels = data || [];
@@ -494,6 +492,7 @@
 
     document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
 
+    // CATEGORIES - DÜZƏLDİLDİ! İndi categories cədvəlindən çəkir
     async function loadCategories() {
         const { data } = await supabaseClient.from('categories').select('*').order('display_order');
         categories = data || [];
@@ -525,6 +524,7 @@
 
     document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
 
+    // WORDS
     async function loadWords(search = '') {
         let query = supabaseClient.from('words').select('*, categories(name)').order('created_at', { ascending: false });
         if (search) query = query.ilike('az', `%${search}%`);

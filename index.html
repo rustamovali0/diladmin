@@ -8,206 +8,348 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg-gradient-start: #f5f7fc;
-            --bg-gradient-end: #e9eef4;
-            --surface: #ffffff;
-            --text-primary: #1e2a3a;
-            --text-secondary: #4a627a;
-            --accent: #f5a623;
-            --danger: #c44536;
-            --success: #2e7d64;
-            --border-light: #e2e8f0;
-            --btn-bg: #f1f5f9;
-            --btn-hover: #e2e8f0;
-            --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
-        }
-
-        body.dark {
-            --bg-gradient-start: #0f1724;
-            --bg-gradient-end: #0a0f18;
-            --surface: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --accent: #fbbf24;
-            --danger: #e05a4a;
-            --success: #4c9a7a;
-            --border-light: #334155;
-            --btn-bg: #334155;
-            --btn-hover: #475569;
-        }
-
+        
         body {
-            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
             font-family: 'Inter', system-ui, sans-serif;
-            color: var(--text-primary);
-            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 10px;
         }
-
-        .container { max-width: 1200px; margin: 0 auto; }
-
+        body.dark {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        
+        /* Login */
+        .login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .login-overlay.hidden { display: none; }
+        .login-card {
+            background: white;
+            border-radius: 32px;
+            padding: 28px 20px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+        body.dark .login-card { background: #1e293b; }
+        .login-card h2 { font-size: 1.4rem; margin-bottom: 8px; background: linear-gradient(135deg, #f5a623, #ff8c42); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 60px;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        body.dark .login-card input { background: #334155; border-color: #475569; color: white; }
+        .login-card .error { color: #dc3545; font-size: 0.75rem; display: none; }
+        .login-card button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 60px;
+            border: none;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f5a623, #ff8c42);
+            color: #1e2a36;
+            cursor: pointer;
+        }
+        
+        .admin-container { display: none; max-width: 1400px; margin: 0 auto; }
+        .admin-container.visible { display: block; }
+        
         .header {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 16px 24px;
-            margin-bottom: 24px;
+            background: white;
+            border-radius: 16px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
-            border: 1px solid var(--border-light);
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .header h1 { font-size: 1.5rem; color: var(--accent); }
-        .view-site { background: var(--accent); color: #1e2a36; padding: 8px 20px; border-radius: 40px; text-decoration: none; font-weight: bold; }
-
+        body.dark .header { background: #1e293b; }
+        .header h1 { color: #f5a623; font-size: 1rem; }
+        .view-site { background: #f5a623; color: #1e2a36; padding: 5px 12px; border-radius: 40px; text-decoration: none; font-weight: bold; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 5px; }
+        
         .tabs {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 24px;
-            background: var(--surface);
-            padding: 12px 20px;
-            border-radius: 60px;
-            border: 1px solid var(--border-light);
+            gap: 6px;
+            margin-bottom: 12px;
+            background: white;
+            padding: 6px 10px;
+            border-radius: 50px;
+            overflow-x: auto;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
+        body.dark .tabs { background: #1e293b; }
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 8px 24px;
+            padding: 6px 14px;
             border-radius: 40px;
             font-weight: 600;
             cursor: pointer;
-            color: var(--text-primary);
+            color: #333;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
-        .tab-btn.active { background: var(--accent); color: #1e2a36; }
-        .tab-content { display: none; }
+        body.dark .tab-btn { color: white; }
+        .tab-btn.active { background: #f5a623; color: #1e2a36; }
+        
+        .tab-content { display: none; background: white; border-radius: 16px; padding: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        body.dark .tab-content { background: #1e293b; }
         .tab-content.active { display: block; }
-
-        .card {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-light);
-        }
-        .card h3 { margin-bottom: 20px; color: var(--accent); font-size: 1.2rem; }
-
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; }
+        
+        .card { margin-bottom: 16px; }
+        .card h3 { font-size: 1rem; margin-bottom: 12px; color: #f5a623; border-left: 3px solid #f5a623; padding-left: 10px; }
+        
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.7rem; color: #4a627a; }
+        body.dark label { color: #94a3b8; }
+        
         input, select, textarea {
             width: 100%;
-            padding: 10px 16px;
-            border: 1px solid var(--border-light);
-            border-radius: 40px;
-            background: var(--surface);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            outline: none;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            font-size: 14px;
         }
-        textarea { border-radius: 20px; resize: vertical; }
-        input:focus, select:focus { border-color: var(--accent); }
-
-        .lang-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
-            padding: 16px;
-            background: var(--btn-bg);
-            border-radius: 20px;
+        
+        select {
+            -webkit-appearance: menulist;
+            appearance: menulist;
+            cursor: pointer;
+            font-size: 14px;
+            min-height: 42px;
         }
-        @media (max-width: 768px) { .lang-grid { grid-template-columns: 1fr; } }
-
+        
+        body.dark select, body.dark input, body.dark textarea { background: #334155; border-color: #475569; color: white; }
+        input:focus, select:focus, textarea:focus { border-color: #f5a623; outline: none; }
+        
         .btn {
-            padding: 10px 24px;
-            border-radius: 40px;
+            padding: 10px 16px;
+            border-radius: 12px;
             border: none;
             font-weight: bold;
             cursor: pointer;
-        }
-        .btn-primary { background: var(--accent); color: #1e2a36; }
-        .btn-danger { background: var(--danger); color: white; }
-
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-light); }
-        th { background: var(--btn-bg); }
-        .action-icons i { margin: 0 6px; cursor: pointer; opacity: 0.7; }
-        .action-icons i:hover { opacity: 1; }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+            font-size: 0.85rem;
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.2s;
+        }
+        .btn-primary { background: #f5a623; color: #1e2a36; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; width: auto; }
+        
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 550px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.75rem; }
+        body.dark th, body.dark td { border-color: #334155; }
+        th { background: #f8fafc; font-weight: 600; }
+        body.dark th { background: #0f1724; }
+        
+        .action-icons i { margin: 0 4px; cursor: pointer; font-size: 14px; padding: 4px; }
+        .fa-edit { color: #f5a623; }
+        .fa-trash { color: #dc3545; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 640px) {
+            body { padding: 16px; }
+            .grid-2 { grid-template-columns: 1fr 1fr; }
+            .header h1 { font-size: 1.2rem; }
+            .tab-btn { padding: 8px 18px; font-size: 0.85rem; }
+            .tab-content { padding: 20px; }
+        }
+        
+        /* ========== MOBIL ÜÇÜN DROPDOWN, KOMPÜTER ÜÇÜN BUTON ========== */
+        .filter-wrapper {
+            margin-bottom: 16px;
+        }
+        
+        /* Mobil (768px və aşağı) - Dropdown göstər */
+        @media (max-width: 768px) {
+            .level-buttons, .category-buttons {
+                display: none;
+            }
+            .level-dropdown, .category-dropdown {
+                display: block;
+            }
+            .level-dropdown select, .category-dropdown select {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+        }
+        
+        /* Kompüter (768px yuxarı) - Buton göstər */
+        @media (min-width: 769px) {
+            .level-buttons, .category-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .level-dropdown, .category-dropdown {
+                display: none;
+            }
+            .filter-btn {
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+                padding: 8px 16px;
+                border-radius: 40px;
+                font-weight: 600;
+                font-size: 0.75rem;
+                cursor: pointer;
+                color: #1e2a3a;
+                transition: all 0.2s;
+            }
+            body.dark .filter-btn {
+                background: #334155;
+                border-color: #475569;
+                color: white;
+            }
+            .filter-btn.active {
+                background: #f5a623;
+                color: #1e2a36;
+                border-color: #f5a623;
+            }
+        }
+        
+        .category-badge {
+            background: #f5a62320;
+            color: #f5a623;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            display: inline-block;
+        }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            visibility: hidden; opacity: 0;
+            padding: 16px;
         }
         .modal-overlay.active { visibility: visible; opacity: 1; }
         .modal-content {
-            background: var(--surface);
-            border-radius: 28px;
-            padding: 24px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 85vh;
-            overflow-y: auto;
+            background: white; border-radius: 20px; padding: 16px;
+            width: 100%; max-width: 550px; max-height: 85vh; overflow-y: auto;
         }
-        .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
-
-        .alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--success);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 40px;
-            z-index: 3000;
-            transform: translateX(120%);
-            transition: 0.3s;
+        body.dark .modal-content { background: #1e293b; }
+        
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; left: 20px;
+            background: #28a745; color: white; padding: 12px 16px;
+            border-radius: 12px; z-index: 2000; display: none;
+            text-align: center; font-size: 0.85rem;
         }
-        .alert.show { transform: translateX(0); }
-        .alert.error { background: var(--danger); }
-
+        @media (min-width: 640px) { .toast { left: auto; max-width: 350px; border-radius: 40px; } }
+        .toast.error { background: #dc3545; }
+        
         .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--surface);
-            border: 1px solid var(--border-light);
-            cursor: pointer;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed; bottom: 16px; left: 16px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: white; border: 1px solid #ddd;
+            cursor: pointer; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
             z-index: 1000;
         }
-
-        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
-        .page-btn { background: var(--btn-bg); border: 1px solid var(--border-light); padding: 6px 12px; border-radius: 30px; cursor: pointer; }
-        .page-btn.active { background: var(--accent); color: #1e2a36; }
+        body.dark .theme-toggle { background: #1e293b; color: white; border-color: #475569; }
+        
+        .pagination { display: flex; gap: 5px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+        .page-btn { padding: 6px 12px; border-radius: 10px; background: #f1f5f9; border: none; cursor: pointer; font-size: 0.7rem; min-width: 36px; }
+        body.dark .page-btn { background: #334155; color: white; }
+        .page-btn.active { background: #f5a623; color: #1e2a36; }
+        
+        .word-count { font-size: 0.7rem; color: #666; margin-bottom: 10px; }
+        body.dark .word-count { color: #94a3b8; }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        body.dark .list-item { border-color: #334155; }
+        .list-item-name { font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .list-item-actions i { margin-left: 6px; cursor: pointer; font-size: 14px; padding: 5px; }
+        
+        .info-text {
+            margin-top: 10px;
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            padding: 6px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        body.dark .info-text { background: #0f1724; color: #94a3b8; }
+        
+        .order-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #f5a62320;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            font-size: 11px;
+            color: #f5a623;
+        }
+        
+        .lang-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+        body.dark .lang-section { background: #0f1724; }
+        .lang-title { font-weight: bold; margin-bottom: 8px; font-size: 0.75rem; color: #f5a623; }
+        
+        /* Filter title */
+        .filter-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #4a627a;
+            margin-bottom: 8px;
+            margin-top: 12px;
+        }
+        body.dark .filter-title { color: #94a3b8; }
     </style>
 </head>
 <body>
-<div class="container">
+
+<!-- Login -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <h2><i class="fas fa-crown"></i> Admin Panel</h2>
+        <p>Daxil olmaq üçün kod daxil edin</p>
+        <input type="password" id="loginCode" placeholder="•••••" maxlength="20" autofocus>
+        <div id="loginError" class="error">❌ Kod səhvdir!</div>
+        <button id="loginBtn">Daxil Ol</button>
+    </div>
+</div>
+
+<!-- Admin Content -->
+<div id="adminContent" class="admin-container">
     <div class="header">
-        <h1><i class="fas fa-cog"></i> Admin Panel - Dil Öyrən</h1>
-        <a href="#" class="view-site" id="viewSiteBtn" target="_blank"><i class="fas fa-eye"></i> Sayta bax</a>
+        <h1><i class="fas fa-cog"></i> Admin Panel</h1>
+        <a href="#" class="view-site" id="viewSiteBtn"><i class="fas fa-eye"></i> Sayta bax</a>
     </div>
 
     <div class="tabs">
@@ -220,488 +362,628 @@
     <!-- Sözlər Tabı -->
     <div id="words-tab" class="tab-content active">
         <div class="card">
-            <h3><i class="fas fa-plus"></i> Yeni Söz Əlavə Et (7 dildə)</h3>
-            <div id="wordMsg" style="display: none; margin-bottom: 16px; padding: 10px; border-radius: 40px; background: var(--success); color: white;"></div>
+            <h3>➕ Yeni Söz Əlavə Et</h3>
             
-            <div class="lang-grid">
-                <div class="form-group"><label>🇦🇿 Azərbaycanca *</label><input type="text" id="wordAz" placeholder="Salam"></div>
-                <div class="form-group"><label>🇬🇧 İngiliscə *</label><input type="text" id="wordEn" placeholder="Hello"></div>
-                <div class="form-group"><label>🔊 İngiliscə Oxunuş</label><input type="text" id="wordEnRead" placeholder="hələʊ"></div>
+            <div class="lang-section">
+                <div class="lang-title">🇦🇿🇬🇧 Əsas Dillər</div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Azərbaycanca *</label><input type="text" id="az" placeholder="salam"></div>
+                    <div class="form-group"><label>İngiliscə *</label><input type="text" id="en" placeholder="hello"></div>
+                    <div class="form-group"><label>Oxunuş</label><input type="text" id="en_read" placeholder="hələʊ"></div>
+                </div>
             </div>
             
-            <div class="lang-grid">
-                <div class="form-group"><label>🇷🇺 Rusca</label><input type="text" id="wordRu" placeholder="Привет"></div>
-                <div class="form-group"><label>🔊 Rusca Oxunuş</label><input type="text" id="wordRuRead" placeholder="privyet"></div>
-                <div class="form-group"><label>🇩🇪 Almanca</label><input type="text" id="wordDe" placeholder="Hallo"></div>
-                <div class="form-group"><label>🔊 Almanca Oxunuş</label><input type="text" id="wordDeRead" placeholder="halo"></div>
-                <div class="form-group"><label>🇪🇸 İspanca</label><input type="text" id="wordEs" placeholder="Hola"></div>
-                <div class="form-group"><label>🔊 İspanca Oxunuş</label><input type="text" id="wordEsRead" placeholder="ola"></div>
-                <div class="form-group"><label>🇵🇹 Portuqalca</label><input type="text" id="wordPt" placeholder="Olá"></div>
-                <div class="form-group"><label>🔊 Portuqalca Oxunuş</label><input type="text" id="wordPtRead" placeholder="ola"></div>
-                <div class="form-group"><label>🇹🇷 Türkcə</label><input type="text" id="wordTr" placeholder="Merhaba"></div>
-                <div class="form-group"><label>🔊 Türkcə Oxunuş</label><input type="text" id="wordTrRead" placeholder="merhaba"></div>
-                <div class="form-group"><label>🇨🇳 Çincə</label><input type="text" id="wordZh" placeholder="你好"></div>
-                <div class="form-group"><label>🔊 Çincə Oxunuş</label><input type="text" id="wordZhRead" placeholder="ni hao"></div>
+            <div class="lang-section">
+                <div class="lang-title">🇷🇺 Rusca</div>
+                <div class="grid-2"><input type="text" id="ru" placeholder="привет"><input type="text" id="ru_read" placeholder="privyet"></div>
+            </div>
+            <div class="lang-section">
+                <div class="lang-title">🇩🇪 Almanca</div>
+                <div class="grid-2"><input type="text" id="de" placeholder="hallo"><input type="text" id="de_read" placeholder="halo"></div>
+            </div>
+            <div class="lang-section">
+                <div class="lang-title">🇪🇸 İspanca</div>
+                <div class="grid-2"><input type="text" id="es" placeholder="hola"><input type="text" id="es_read" placeholder="ola"></div>
+            </div>
+            <div class="lang-section">
+                <div class="lang-title">🇵🇹 Portuqalca</div>
+                <div class="grid-2"><input type="text" id="pt" placeholder="olá"><input type="text" id="pt_read" placeholder="ola"></div>
+            </div>
+            <div class="lang-section">
+                <div class="lang-title">🇹🇷 Türkcə</div>
+                <div class="grid-2"><input type="text" id="tr" placeholder="merhaba"><input type="text" id="tr_read" placeholder="merhaba"></div>
+            </div>
+            <div class="lang-section">
+                <div class="lang-title">🇨🇳 Çincə</div>
+                <div class="grid-2"><input type="text" id="zh" placeholder="你好"><input type="text" id="zh_read" placeholder="ni hao"></div>
             </div>
             
-            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                <div class="form-group" style="flex:1"><label>📚 Səviyyə</label><select id="wordLevel"></select></div>
-                <div class="form-group" style="flex:1"><label>🏷️ Kateqoriya</label><select id="wordCategory"></select></div>
+            <!-- Səviyyə və Kateqoriya - Mobil: Dropdown, Kompüter: Buton -->
+            <div class="filter-title">📚 Səviyyə</div>
+            
+            <!-- Mobil üçün Dropdown -->
+            <div class="level-dropdown">
+                <select id="level_select_mobile"></select>
             </div>
             
-            <button class="btn btn-primary" id="addWordBtn"><i class="fas fa-save"></i> Sözü Yadda Saxla</button>
+            <!-- Kompüter üçün Butonlar -->
+            <div class="level-buttons" id="level_buttons"></div>
+            
+            <div class="filter-title">🏷️ Kateqoriya</div>
+            
+            <!-- Mobil üçün Dropdown -->
+            <div class="category-dropdown">
+                <select id="category_select_mobile"></select>
+            </div>
+            
+            <!-- Kompüter üçün Butonlar -->
+            <div class="category-buttons" id="category_buttons"></div>
+            
+            <button class="btn btn-primary" id="addWordBtn" style="margin-top: 16px;"><i class="fas fa-save"></i> Sözü Yadda Saxla</button>
+            <div class="info-text">Səviyyə seçilməzsə "Başlanğıc", Kateqoriya seçilməzsə "Əsas" olacaq</div>
         </div>
-
+        
         <div class="card">
-            <h3><i class="fas fa-list"></i> Sözlər Siyahısı</h3>
+            <h3>📋 Sözlər Siyahısı</h3>
             <div class="form-group"><input type="text" id="searchWord" placeholder="🔍 Axtar..."></div>
-            <div id="wordsList" class="table-wrapper"></div>
-            <div id="wordsPagination" class="pagination"></div>
+            <div class="word-count" id="wordCount">0 söz</div>
+            <div class="table-wrapper"><div id="wordsList"></div></div>
+            <div id="pagination" class="pagination"></div>
         </div>
     </div>
 
     <!-- Səviyyələr Tabı -->
     <div id="levels-tab" class="tab-content">
-        <div class="card"><h3>Yeni Səviyyə</h3><input type="text" id="newLevel" placeholder="Səviyyə adı"><button class="btn btn-primary" id="addLevelBtn" style="margin-top:10px">Əlavə Et</button></div>
-        <div class="card"><h3>Səviyyələr Siyahısı</h3><div id="levelsList" class="table-wrapper"></div></div>
+        <div class="card">
+            <h3>➕ Yeni Səviyyə</h3>
+            <input type="text" id="newLevel" placeholder="Səviyyə adı">
+            <button class="btn btn-primary" id="addLevelBtn" style="margin-top: 10px;">Əlavə Et</button>
+        </div>
+        <div class="card">
+            <h3>📊 Səviyyələr Siyahısı</h3>
+            <div id="levelsList"></div>
+        </div>
     </div>
 
     <!-- Kateqoriyalar Tabı -->
     <div id="categories-tab" class="tab-content">
-        <div class="card"><h3>Yeni Kateqoriya</h3><input type="text" id="newCategory" placeholder="Kateqoriya adı"><button class="btn btn-primary" id="addCategoryBtn" style="margin-top:10px">Əlavə Et</button></div>
-        <div class="card"><h3>Kateqoriyalar Siyahısı</h3><div id="categoriesList" class="table-wrapper"></div></div>
+        <div class="card">
+            <h3>➕ Yeni Kateqoriya</h3>
+            <input type="text" id="newCategory" placeholder="Kateqoriya adı">
+            <button class="btn btn-primary" id="addCategoryBtn" style="margin-top: 10px;">Əlavə Et</button>
+        </div>
+        <div class="card">
+            <h3>🏷️ Kateqoriyalar Siyahısı</h3>
+            <div class="word-count" id="categoryCount">0 kateqoriya</div>
+            <div id="categoriesList"></div>
+        </div>
     </div>
 
     <!-- Parametrlər Tabı -->
     <div id="settings-tab" class="tab-content">
-        <div class="card"><h3>Sayt Parametrləri</h3>
-            <div class="form-group"><label>Sayt Adı</label><input type="text" id="siteName" placeholder="Dil Öyrən"></div>
-            <div class="form-group"><label>Sayt Alt Başlığı</label><input type="text" id="siteSubtitle" placeholder="7 dil | 2000+ söz"></div>
-            <div class="form-group"><label>Yaradıcı Adı</label><input type="text" id="creatorName" placeholder="Rustamoff"></div>
-            <div class="form-group"><label>Admin Giriş Kodu</label><input type="text" id="accessCode" placeholder="admin123"></div>
-            <div class="form-group"><label>Footer Mətni</label><textarea id="footerText" rows="2" placeholder="© 2026 Dil Öyrən | Bütün hüquqlar qorunur | rustamoff.site"></textarea></div>
-            <div class="form-group"><label>Instagram URL</label><input type="url" id="instagramUrl" placeholder="https://instagram.com/..."></div>
-            <div class="form-group"><label>TikTok URL</label><input type="url" id="tiktokUrl" placeholder="https://tiktok.com/@..."></div>
-            <div class="form-group"><label>YouTube URL</label><input type="url" id="youtubeUrl" placeholder="https://youtube.com/@..."></div>
+        <div class="card">
+            <h3>⚙️ Sayt Parametrləri</h3>
+            <div class="grid-2">
+                <div class="form-group"><label>Sayt Adı</label><input type="text" id="siteName" placeholder="Dil Öyrən"></div>
+                <div class="form-group"><label>Alt Başlıq</label><input type="text" id="siteSubtitle" placeholder="7 dil | 2000+ söz"></div>
+                <div class="form-group"><label>Yaradıcı Adı</label><input type="text" id="creatorName" placeholder="Rustamoff"></div>
+                <div class="form-group"><label>Admin Kodları</label><input type="text" id="adminCodes" placeholder="12345, admin123"></div>
+            </div>
+            <div class="form-group"><label>Footer Mətni</label><textarea id="footerText" rows="2" placeholder="© 2026 Dil Öyrən"></textarea></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Instagram URL</label><input type="url" id="instagramUrl"></div>
+                <div class="form-group"><label>TikTok URL</label><input type="url" id="tiktokUrl"></div>
+                <div class="form-group"><label>YouTube URL</label><input type="url" id="youtubeUrl"></div>
+            </div>
             <button class="btn btn-primary" id="saveSettingsBtn">Yadda Saxla</button>
         </div>
     </div>
 </div>
 
 <div class="theme-toggle" id="themeToggle">🌙</div>
+<div id="toast" class="toast"></div>
 
 <div id="editModal" class="modal-overlay">
     <div class="modal-content">
-        <h3 id="modalTitle">Sözü Redaktə Et</h3>
-        <div id="modalBody"></div>
-        <div class="modal-buttons">
-            <button class="btn btn-primary" id="saveEditBtn">Yadda Saxla</button>
-            <button class="btn" id="closeModalBtn">Bağla</button>
+        <h3>✏️ Sözü Redaktə Et</h3>
+        <div id="editForm"></div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap;">
+            <button class="btn btn-primary btn-sm" id="saveEditBtn">Yadda Saxla</button>
+            <button class="btn btn-sm" id="closeModalBtn">Bağla</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SUPABASE_URL = "https://icwpaipqqqwjpooazmcu.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_W5rnAxonO_Sq-EnCdlFU7Q_mkmi37yJ";
-    
-    let supabase = null;
-    let allWords = [];
-    let levels = [];
-    let categories = [];
-    let currentPage = 1;
-    const itemsPerPage = 20;
-    let currentAccessCode = "admin123";
-    let isLoggedIn = false;
+    (function() {
+        const SUPABASE_URL = "https://icwpaipqqqwjpooazmcu.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_W5rnAxonO_Sq-EnCdlFU7Q_mkmi37yJ";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let allWords = [], levels = [], categories = [];
+        let currentPage = 1;
+        let selectedLevel = "all";
+        let selectedCategory = "all";
+        const itemsPerPage = 20;
+        let currentEditId = null;
+        let validCodes = ['12345', 'admin123'];
 
-    const wordsListDiv = document.getElementById("wordsList");
-    const levelsListDiv = document.getElementById("levelsList");
-    const categoriesListDiv = document.getElementById("categoriesList");
-    const wordLevelSelect = document.getElementById("wordLevel");
-    const wordCategorySelect = document.getElementById("wordCategory");
-    const searchInput = document.getElementById("searchWord");
-    const wordsPagination = document.getElementById("wordsPagination");
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
 
-    if (typeof supabase !== 'undefined') {
-        supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+        }
 
-    async function checkAccessCode() {
-        try {
-            const { data } = await supabase.from('site_settings').select('access_code').limit(1);
-            if (data && data[0]) currentAccessCode = data[0].access_code || "admin123";
-            const savedCode = localStorage.getItem('admin_code');
-            if (savedCode === currentAccessCode) {
-                isLoggedIn = true;
-                loadAllData();
+        // Giriş
+        async function checkLogin() {
+            try {
+                const { data } = await supabaseClient.from('site_settings').select('admin_codes').limit(1);
+                if (data && data[0] && data[0].admin_codes) validCodes = data[0].admin_codes;
+                const savedCode = localStorage.getItem('admin_code');
+                if (savedCode && validCodes.includes(savedCode)) {
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    document.getElementById('adminContent').classList.add('visible');
+                    loadAll();
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        document.getElementById('loginBtn').onclick = async () => {
+            const enteredCode = document.getElementById('loginCode').value;
+            const errorDiv = document.getElementById('loginError');
+            if (validCodes.includes(enteredCode)) {
+                localStorage.setItem('admin_code', enteredCode);
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('adminContent').classList.add('visible');
+                await loadAll();
             } else {
-                const code = prompt("Admin giriş kodunu daxil edin:");
-                if (code === currentAccessCode) {
-                    localStorage.setItem('admin_code', code);
-                    isLoggedIn = true;
-                    loadAllData();
-                } else {
-                    alert("❌ Kod səhvdir!");
-                    document.body.innerHTML = '<div style="text-align:center;padding:50px"><h2>🔒 Giriş icazəsi yoxdur</h2><p>Admin kodu daxil edilməyib.</p></div>';
+                errorDiv.style.display = 'block';
+                setTimeout(() => errorDiv.style.display = 'none', 2000);
+                document.getElementById('loginCode').value = '';
+                document.getElementById('loginCode').focus();
+            }
+        };
+        document.getElementById('loginCode').onkeypress = (e) => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); };
+
+        async function loadAll() {
+            await loadWords();
+            await loadLevels();
+            await loadCategories();
+            await loadSettings();
+            initTabs();
+        }
+
+        function initTabs() {
+            const btns = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            btns.forEach(btn => {
+                btn.onclick = function() {
+                    const tabId = this.dataset.tab;
+                    btns.forEach(b => b.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                };
+            });
+        }
+
+        // Sözlər (filter ilə)
+        async function loadWords(search = '') {
+            let query = supabaseClient.from('words').select('*').order('id', { ascending: true });
+            if (search) query = query.ilike('az', `%${search}%`);
+            if (selectedLevel !== "all") query = query.eq('level', selectedLevel);
+            if (selectedCategory !== "all") query = query.eq('category', selectedCategory);
+            const { data } = await query;
+            allWords = data || [];
+            document.getElementById('wordCount').innerText = allWords.length + ' söz';
+            renderWords();
+        }
+
+        function renderWords() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageWords = allWords.slice(start, start + itemsPerPage);
+            const container = document.getElementById('wordsList');
+            if (!container) return;
+            
+            if (pageWords.length === 0) {
+                container.innerHTML = '<p style="text-align:center;padding:20px">📭 Heç bir söz yoxdur</p>';
+                return;
+            }
+            
+            let html = `<table><thead><tr><th>#</th><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead><tbody>`;
+            pageWords.forEach((w, idx) => {
+                html += `<tr>
+                    <td>${start + idx + 1}</td>
+                    <td><span class="category-badge">${w.id}</span></td>
+                    <td><strong>${escapeHtml(w.az)}</strong></td>
+                    <td>${escapeHtml(w.en)}</td>
+                    <td><span class="category-badge">${escapeHtml(w.level || 'Başlanğıc')}</span></td>
+                    <td><span class="category-badge">${escapeHtml(w.category || 'Əsas')}</span></td>
+                    <td class="action-icons">
+                        <i class="fas fa-edit" onclick="window.editWord(${w.id})"></i>
+                        <i class="fas fa-trash" onclick="window.deleteWord(${w.id})"></i>
+                    </td>
+                <tr>`;
+            });
+            html += `</tbody> licensierad`;
+            container.innerHTML = html;
+            
+            const totalPages = Math.ceil(allWords.length / itemsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            if (paginationDiv) {
+                paginationDiv.innerHTML = '';
+                for (let i = 1; i <= Math.min(totalPages, 8); i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
+                    btn.onclick = () => { currentPage = i; renderWords(); };
+                    paginationDiv.appendChild(btn);
                 }
             }
-        } catch(e) {
-            console.error(e);
-            loadAllData();
         }
-    }
 
-    async function loadAllData() {
-        await loadWords();
-        await loadLevels();
-        await loadCategories();
-        await loadSettings();
-    }
-
-    async function loadWords(search = '') {
-        let query = supabase.from('words').select('*').order('id', { ascending: false });
-        if (search) query = query.ilike('az', `%${search}%`);
-        const { data } = await query;
-        allWords = data || [];
-        renderWordsList();
-    }
-
-    function renderWordsList() {
-        const start = (currentPage - 1) * itemsPerPage;
-        const pageWords = allWords.slice(start, start + itemsPerPage);
-        if (pageWords.length === 0) { wordsListDiv.innerHTML = '<p>📭 Heç bir söz yoxdur</p>'; wordsPagination.innerHTML = ''; return; }
-        
-        wordsListDiv.innerHTML = `
-            <table>
-                <thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Rusca</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
-                <tbody>
-                    ${pageWords.map(w => `
-                        <tr>
-                            <td>${w.id}</td>
-                            <td>${escapeHtml(w.az)}</td>
-                            <td>${escapeHtml(w.en)}</td>
-                            <td>${escapeHtml(w.ru || '-')}</td>
-                            <td>${escapeHtml(w.level || '-')}</td>
-                            <td>${escapeHtml(w.category || '-')}</td>
-                            <td class="action-icons">
-                                <i class="fas fa-edit" onclick="editWord(${w.id})"></i>
-                                <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-        
-        const totalPages = Math.ceil(allWords.length / itemsPerPage);
-        wordsPagination.innerHTML = '';
-        for (let i = 1; i <= Math.min(totalPages, 10); i++) {
-            const btn = document.createElement('button');
-            btn.textContent = i;
-            btn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
-            btn.onclick = () => { currentPage = i; renderWordsList(); };
-            wordsPagination.appendChild(btn);
-        }
-    }
-
-    async function loadLevels() {
-        const { data } = await supabase.from('levels').select('*').order('display_order');
-        levels = data || [];
-        renderLevelsList();
-        if (wordLevelSelect) wordLevelSelect.innerHTML = '<option value="">Səviyyə seçin</option>' + levels.map(l => `<option value="${escapeHtml(l.name)}">${escapeHtml(l.name)}</option>`).join('');
-    }
-
-    function renderLevelsList() {
-        if (!levelsListDiv) return;
-        if (levels.length === 0) { levelsListDiv.innerHTML = '<p>Heç bir səviyyə yoxdur</p>'; return; }
-        levelsListDiv.innerHTML = `
-            <table><thead><tr><th>ID</th><th>Ad</th><th>Sıra</th><th>Əməliyyat</th></tr></thead>
-            <tbody>${levels.map(l => `
-                <tr>
-                    <td>${l.id}</td>
-                    <td>${escapeHtml(l.name)}</td>
-                    <td>${l.display_order || 0}</td>
-                    <td class="action-icons">
-                        <i class="fas fa-edit" onclick="editLevel(${l.id}, '${escapeHtml(l.name)}', ${l.display_order || 0})"></i>
-                        <i class="fas fa-trash" onclick="deleteLevel(${l.id})"></i>
-                    </td>
-                </tr>
-            `).join('')}</tbody></table>
-        `;
-    }
-
-    async function loadCategories() {
-        const { data } = await supabase.from('categories').select('*').order('display_order');
-        categories = data || [];
-        renderCategoriesList();
-        if (wordCategorySelect) wordCategorySelect.innerHTML = '<option value="">Kateqoriya seçin</option>' + categories.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
-    }
-
-    function renderCategoriesList() {
-        if (!categoriesListDiv) return;
-        if (categories.length === 0) { categoriesListDiv.innerHTML = '<p>Heç bir kateqoriya yoxdur</p>'; return; }
-        categoriesListDiv.innerHTML = `
-            <table><thead><tr><th>ID</th><th>Kateqoriya</th><th>Sıra</th><th>Əməliyyat</th></tr></thead>
-            <tbody>${categories.map(c => `
-                <tr>
-                    <td>${c.id}</td>
-                    <td>${escapeHtml(c.name)}</td>
-                    <td>${c.display_order || 0}</td>
-                    <td class="action-icons">
-                        <i class="fas fa-edit" onclick="editCategory(${c.id}, '${escapeHtml(c.name)}')"></i>
-                        <i class="fas fa-trash" onclick="deleteCategory(${c.id}, '${escapeHtml(c.name)}')"></i>
-                    </td>
-                </tr>
-            `).join('')}</tbody></table>
-        `;
-    }
-
-    async function loadSettings() {
-        const { data } = await supabase.from('site_settings').select('*').limit(1);
-        if (data && data[0]) {
-            document.getElementById('siteName').value = data[0].site_name || '';
-            document.getElementById('siteSubtitle').value = data[0].site_subtitle || '';
-            document.getElementById('creatorName').value = data[0].creator_name || '';
-            document.getElementById('accessCode').value = data[0].access_code || '';
-            document.getElementById('footerText').value = data[0].footer_text || '';
-            document.getElementById('instagramUrl').value = data[0].instagram_url || '';
-            document.getElementById('tiktokUrl').value = data[0].tiktok_url || '';
-            document.getElementById('youtubeUrl').value = data[0].youtube_url || '';
-        }
-    }
-
-    async function addWord() {
-        const az = document.getElementById('wordAz').value.trim();
-        const en = document.getElementById('wordEn').value.trim();
-        if (!az || !en) { showMessage('Azərbaycanca və İngiliscə söz daxil edin!', true); return; }
-        
-        const newWord = {
-            az, en,
-            en_read: document.getElementById('wordEnRead').value.trim() || en.toLowerCase(),
-            ru: document.getElementById('wordRu').value.trim() || null,
-            ru_read: document.getElementById('wordRuRead').value.trim() || null,
-            de: document.getElementById('wordDe').value.trim() || null,
-            de_read: document.getElementById('wordDeRead').value.trim() || null,
-            es: document.getElementById('wordEs').value.trim() || null,
-            es_read: document.getElementById('wordEsRead').value.trim() || null,
-            pt: document.getElementById('wordPt').value.trim() || null,
-            pt_read: document.getElementById('wordPtRead').value.trim() || null,
-            tr: document.getElementById('wordTr').value.trim() || null,
-            tr_read: document.getElementById('wordTrRead').value.trim() || null,
-            zh: document.getElementById('wordZh').value.trim() || null,
-            zh_read: document.getElementById('wordZhRead').value.trim() || null,
-            level: document.getElementById('wordLevel').value || null,
-            category: document.getElementById('wordCategory').value || null,
-            created_at: new Date()
-        };
-        
-        const { error } = await supabase.from('words').insert([newWord]);
-        if (!error) {
-            showMessage('✅ Söz əlavə edildi!');
-            document.getElementById('wordAz').value = '';
-            document.getElementById('wordEn').value = '';
-            document.getElementById('wordEnRead').value = '';
-            document.getElementById('wordRu').value = '';
-            document.getElementById('wordRuRead').value = '';
-            document.getElementById('wordDe').value = '';
-            document.getElementById('wordDeRead').value = '';
-            document.getElementById('wordEs').value = '';
-            document.getElementById('wordEsRead').value = '';
-            document.getElementById('wordPt').value = '';
-            document.getElementById('wordPtRead').value = '';
-            document.getElementById('wordTr').value = '';
-            document.getElementById('wordTrRead').value = '';
-            document.getElementById('wordZh').value = '';
-            document.getElementById('wordZhRead').value = '';
-            loadWords();
-            loadCategories();
-        } else {
-            showMessage('❌ Xəta: ' + error.message, true);
-        }
-    }
-
-    async function deleteWord(id) {
-        if (!confirm('Bu sözü silmək istədiyinizdən əminsiniz?')) return;
-        await supabase.from('words').delete().eq('id', id);
-        loadWords();
-        loadCategories();
-        showMessage('✅ Söz silindi!');
-    }
-
-    window.editWord = async (id) => {
-        const word = allWords.find(w => w.id === id);
-        if (!word) return;
-        
-        document.getElementById('modalTitle').innerText = '✏️ Sözü Redaktə Et (Bütün dillər)';
-        document.getElementById('modalBody').innerHTML = `
-            <div class="lang-grid">
-                <div class="form-group"><label>🇦🇿 Azərbaycanca</label><input type="text" id="editAz" value="${escapeHtml(word.az)}"></div>
-                <div class="form-group"><label>🇬🇧 İngiliscə</label><input type="text" id="editEn" value="${escapeHtml(word.en)}"></div>
-                <div class="form-group"><label>🔊 İng. Oxunuş</label><input type="text" id="editEnRead" value="${escapeHtml(word.en_read || '')}"></div>
-            </div>
-            <div class="lang-grid">
-                <div class="form-group"><label>🇷🇺 Rusca</label><input type="text" id="editRu" value="${escapeHtml(word.ru || '')}"></div>
-                <div class="form-group"><label>🔊 Rusca Oxunuş</label><input type="text" id="editRuRead" value="${escapeHtml(word.ru_read || '')}"></div>
-                <div class="form-group"><label>🇩🇪 Almanca</label><input type="text" id="editDe" value="${escapeHtml(word.de || '')}"></div>
-                <div class="form-group"><label>🔊 Alm. Oxunuş</label><input type="text" id="editDeRead" value="${escapeHtml(word.de_read || '')}"></div>
-                <div class="form-group"><label>🇪🇸 İspanca</label><input type="text" id="editEs" value="${escapeHtml(word.es || '')}"></div>
-                <div class="form-group"><label>🔊 İsp. Oxunuş</label><input type="text" id="editEsRead" value="${escapeHtml(word.es_read || '')}"></div>
-                <div class="form-group"><label>🇵🇹 Portuqalca</label><input type="text" id="editPt" value="${escapeHtml(word.pt || '')}"></div>
-                <div class="form-group"><label>🔊 Port. Oxunuş</label><input type="text" id="editPtRead" value="${escapeHtml(word.pt_read || '')}"></div>
-                <div class="form-group"><label>🇹🇷 Türkcə</label><input type="text" id="editTr" value="${escapeHtml(word.tr || '')}"></div>
-                <div class="form-group"><label>🔊 Türk Oxunuş</label><input type="text" id="editTrRead" value="${escapeHtml(word.tr_read || '')}"></div>
-                <div class="form-group"><label>🇨🇳 Çincə</label><input type="text" id="editZh" value="${escapeHtml(word.zh || '')}"></div>
-                <div class="form-group"><label>🔊 Çin Oxunuş</label><input type="text" id="editZhRead" value="${escapeHtml(word.zh_read || '')}"></div>
-            </div>
-            <div style="display: flex; gap: 16px;">
-                <div class="form-group" style="flex:1"><label>Səviyyə</label><select id="editLevel">${levels.map(l => `<option value="${l.name}" ${word.level === l.name ? 'selected' : ''}>${l.name}</option>`).join('')}</select></div>
-                <div class="form-group" style="flex:1"><label>Kateqoriya</label><select id="editCategory"><option value="">Seçilməyib</option>${categories.map(c => `<option value="${c.name}" ${word.category === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div>
-            </div>
-        `;
-        document.getElementById('editModal').classList.add('active');
-        window.currentEditId = id;
-    };
-
-    document.getElementById('saveEditBtn').onclick = async () => {
-        const id = window.currentEditId;
-        await supabase.from('words').update({
-            az: document.getElementById('editAz').value,
-            en: document.getElementById('editEn').value,
-            en_read: document.getElementById('editEnRead').value,
-            ru: document.getElementById('editRu').value || null,
-            ru_read: document.getElementById('editRuRead').value || null,
-            de: document.getElementById('editDe').value || null,
-            de_read: document.getElementById('editDeRead').value || null,
-            es: document.getElementById('editEs').value || null,
-            es_read: document.getElementById('editEsRead').value || null,
-            pt: document.getElementById('editPt').value || null,
-            pt_read: document.getElementById('editPtRead').value || null,
-            tr: document.getElementById('editTr').value || null,
-            tr_read: document.getElementById('editTrRead').value || null,
-            zh: document.getElementById('editZh').value || null,
-            zh_read: document.getElementById('editZhRead').value || null,
-            level: document.getElementById('editLevel').value,
-            category: document.getElementById('editCategory').value
-        }).eq('id', id);
-        document.getElementById('editModal').classList.remove('active');
-        loadWords();
-        showMessage('✅ Söz yeniləndi!');
-    };
-
-    window.editLevel = (id, name, order) => {
-        const newName = prompt("Yeni səviyyə adı:", name);
-        if (newName && newName.trim()) {
-            supabase.from('levels').update({ name: newName.trim(), display_order: order }).eq('id', id).then(() => loadLevels());
-            showMessage('✅ Səviyyə yeniləndi!');
-        }
-    };
-
-    window.deleteLevel = async (id) => { 
-        if (confirm('Səviyyəni silmək istədiyinizdən əminsiniz?')) {
-            await supabase.from('levels').delete().eq('id', id); 
-            loadLevels();
-            showMessage('✅ Səviyyə silindi!');
-        }
-    };
-
-    window.editCategory = (id, name) => {
-        const newName = prompt("Yeni kateqoriya adı:", name);
-        if (newName && newName.trim()) {
-            supabase.from('categories').update({ name: newName.trim() }).eq('id', id).then(() => {
-                loadCategories();
-                loadWords();
+        // Söz əlavə et
+        window.addWord = async function() {
+            const az = document.getElementById('az').value.trim();
+            const en = document.getElementById('en').value.trim();
+            if (!az || !en) { showToast('Azərbaycanca və İngiliscə daxil edin!', true); return; }
+            
+            // Ekran ölçüsünə görə hansı select-in istifadə olunduğunu yoxla
+            const isMobile = window.innerWidth <= 768;
+            let levelValue, categoryValue;
+            
+            if (isMobile) {
+                levelValue = document.getElementById('level_select_mobile').value;
+                categoryValue = document.getElementById('category_select_mobile').value;
+            } else {
+                levelValue = selectedLevel === "all" ? '' : selectedLevel;
+                categoryValue = selectedCategory === "all" ? '' : selectedCategory;
+            }
+            
+            if (!levelValue) levelValue = 'Başlanğıc';
+            if (!categoryValue) categoryValue = 'Əsas';
+            
+            const newWord = {
+                az, en,
+                en_read: document.getElementById('en_read').value || null,
+                ru: document.getElementById('ru').value || null,
+                ru_read: document.getElementById('ru_read').value || null,
+                de: document.getElementById('de').value || null,
+                de_read: document.getElementById('de_read').value || null,
+                es: document.getElementById('es').value || null,
+                es_read: document.getElementById('es_read').value || null,
+                pt: document.getElementById('pt').value || null,
+                pt_read: document.getElementById('pt_read').value || null,
+                tr: document.getElementById('tr').value || null,
+                tr_read: document.getElementById('tr_read').value || null,
+                zh: document.getElementById('zh').value || null,
+                zh_read: document.getElementById('zh_read').value || null,
+                level: levelValue,
+                category: categoryValue,
+                created_at: new Date()
+            };
+            
+            const { error } = await supabaseClient.from('words').insert([newWord]);
+            if (error) { showToast('Xəta: ' + error.message, true); return; }
+            
+            showToast('✅ Söz əlavə edildi!');
+            ['az', 'en', 'en_read', 'ru', 'ru_read', 'de', 'de_read', 'es', 'es_read', 'pt', 'pt_read', 'tr', 'tr_read', 'zh', 'zh_read'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
             });
-            showMessage('✅ Kateqoriya yeniləndi!');
-        }
-    };
-
-    window.deleteCategory = async (id, name) => { 
-        if (confirm(`"${name}" kateqoriyasını silmək?`)) {
-            await supabase.from('categories').delete().eq('id', id); 
-            await supabase.from('words').update({ category: null, category_id: null }).eq('category', name);
-            loadCategories();
-            loadWords();
-            showMessage('✅ Kateqoriya silindi!');
-        }
-    };
-
-    async function addLevel() { 
-        const name = document.getElementById('newLevel').value.trim(); 
-        if (!name) { showMessage('Səviyyə adı daxil edin!', true); return; }
-        await supabase.from('levels').insert([{ name, display_order: levels.length + 1 }]); 
-        document.getElementById('newLevel').value = ''; 
-        loadLevels();
-        showMessage('✅ Səviyyə əlavə edildi!');
-    }
-
-    async function addCategory() { 
-        const name = document.getElementById('newCategory').value.trim(); 
-        if (!name) { showMessage('Kateqoriya adı daxil edin!', true); return; }
-        await supabase.from('categories').insert([{ name, display_order: categories.length + 1 }]); 
-        document.getElementById('newCategory').value = ''; 
-        loadCategories();
-        showMessage('✅ Kateqoriya əlavə edildi!');
-    }
-
-    async function saveSettings() {
-        const { data: existing } = await supabase.from('site_settings').select('id').limit(1);
-        const data = {
-            site_name: document.getElementById('siteName').value,
-            site_subtitle: document.getElementById('siteSubtitle').value,
-            creator_name: document.getElementById('creatorName').value,
-            access_code: document.getElementById('accessCode').value,
-            footer_text: document.getElementById('footerText').value,
-            instagram_url: document.getElementById('instagramUrl').value,
-            tiktok_url: document.getElementById('tiktokUrl').value,
-            youtube_url: document.getElementById('youtubeUrl').value,
-            updated_at: new Date()
+            await loadWords();
+            await loadCategories();
         };
-        if (existing && existing[0]) {
-            await supabase.from('site_settings').update(data).eq('id', existing[0].id);
-        } else {
-            await supabase.from('site_settings').insert([data]);
+
+        window.deleteWord = async function(id) {
+            if (!confirm('Bu sözü silmək?')) return;
+            await supabaseClient.from('words').delete().eq('id', id);
+            await loadWords();
+            showToast('✅ Söz silindi!');
+        };
+
+        window.editWord = async function(id) {
+            const word = allWords.find(w => w.id === id);
+            if (!word) return;
+            currentEditId = id;
+            
+            document.getElementById('editForm').innerHTML = `
+                <div class="form-group"><label>🔢 ID</label><input type="number" id="edit_id" value="${word.id}"></div>
+                <div class="form-group"><label>🇦🇿 Azərbaycanca</label><input type="text" id="edit_az" value="${escapeHtml(word.az)}"></div>
+                <div class="form-group"><label>🇬🇧 İngiliscə</label><input type="text" id="edit_en" value="${escapeHtml(word.en)}"></div>
+                <div class="form-group"><label>🔊 Oxunuş</label><input type="text" id="edit_en_read" value="${escapeHtml(word.en_read || '')}"></div>
+                <div class="form-group"><label>🇷🇺 Rusca</label><input type="text" id="edit_ru" value="${escapeHtml(word.ru || '')}"></div>
+                <div class="form-group"><label>🇩🇪 Almanca</label><input type="text" id="edit_de" value="${escapeHtml(word.de || '')}"></div>
+                <div class="form-group"><label>🇪🇸 İspanca</label><input type="text" id="edit_es" value="${escapeHtml(word.es || '')}"></div>
+                <div class="form-group"><label>🇵🇹 Portuqalca</label><input type="text" id="edit_pt" value="${escapeHtml(word.pt || '')}"></div>
+                <div class="form-group"><label>🇹🇷 Türkcə</label><input type="text" id="edit_tr" value="${escapeHtml(word.tr || '')}"></div>
+                <div class="form-group"><label>🇨🇳 Çincə</label><input type="text" id="edit_zh" value="${escapeHtml(word.zh || '')}"></div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Səviyyə</label><select id="edit_level">${levels.map(l => `<option value="${l.name}" ${word.level === l.name ? 'selected' : ''}>${l.name}</option>`).join('')}<option value="Başlanğıc" ${word.level === 'Başlanğıc' ? 'selected' : ''}>Başlanğıc</option></select></div>
+                    <div class="form-group"><label>Kateqoriya</label><select id="edit_category"><option value="Əsas" ${word.category === 'Əsas' ? 'selected' : ''}>Əsas</option>${categories.map(c => `<option value="${c.name}" ${word.category === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div>
+                </div>
+            `;
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        // Səviyyələr
+        async function loadLevels() {
+            const { data } = await supabaseClient.from('levels').select('*').order('display_order');
+            levels = data || [];
+            const container = document.getElementById('levelsList');
+            if (container) {
+                if (levels.length === 0) container.innerHTML = '<p>Heç bir səviyyə yoxdur</p>';
+                else {
+                    let html = '';
+                    levels.forEach((l, idx) => {
+                        html += `<div class="list-item">
+                            <div class="list-item-name"><span class="order-number">${idx + 1}</span> ${escapeHtml(l.name)}</div>
+                            <div class="list-item-actions"><i class="fas fa-trash" onclick="deleteLevel(${l.id})" style="color:#dc3545"></i></div>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                }
+            }
+            
+            // Həm mobil dropdown, həm də kompüter butonlarını doldur
+            const levelSelectMobile = document.getElementById('level_select_mobile');
+            const levelButtons = document.getElementById('level_buttons');
+            
+            if (levelSelectMobile) {
+                let options = '<option value="all">Bütün səviyyələr</option>';
+                levels.forEach(l => { options += `<option value="${escapeHtml(l.name)}">${escapeHtml(l.name)}</option>`; });
+                options += '<option value="Başlanğıc">Başlanğıc</option>';
+                levelSelectMobile.innerHTML = options;
+                levelSelectMobile.value = selectedLevel;
+                levelSelectMobile.onchange = (e) => { selectedLevel = e.target.value; currentPage = 1; loadWords(); };
+            }
+            
+            if (levelButtons) {
+                let buttons = `<button class="filter-btn ${selectedLevel === "all" ? "active" : ""}" data-level="all">Bütün</button>`;
+                levels.forEach(l => {
+                    buttons += `<button class="filter-btn ${selectedLevel === l.name ? "active" : ""}" data-level="${escapeHtml(l.name)}">${escapeHtml(l.name)}</button>`;
+                });
+                buttons += `<button class="filter-btn ${selectedLevel === "Başlanğıc" ? "active" : ""}" data-level="Başlanğıc">Başlanğıc</button>`;
+                levelButtons.innerHTML = buttons;
+                
+                levelButtons.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        selectedLevel = btn.dataset.level;
+                        currentPage = 1;
+                        loadWords();
+                        updateLevelButtons();
+                    };
+                });
+            }
         }
-        showMessage('✅ Parametrlər yadda saxlandı!');
-        localStorage.setItem('admin_code', data.access_code);
-    }
+        
+        function updateLevelButtons() {
+            document.querySelectorAll('#level_buttons .filter-btn').forEach(btn => {
+                if (btn.dataset.level === selectedLevel) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
 
-    function showMessage(msg, isError = false) {
-        const msgDiv = document.getElementById('wordMsg');
-        if (!msgDiv) return;
-        msgDiv.textContent = msg;
-        msgDiv.style.display = 'block';
-        msgDiv.style.background = isError ? 'var(--danger)' : 'var(--success)';
-        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
-    }
+        window.addLevel = async function() {
+            const name = document.getElementById('newLevel').value.trim();
+            if (!name) { showToast('Səviyyə adı daxil edin!', true); return; }
+            await supabaseClient.from('levels').insert([{ name, display_order: levels.length + 1 }]);
+            document.getElementById('newLevel').value = '';
+            await loadLevels();
+            showToast('✅ Səviyyə əlavə edildi!');
+        };
 
-    function escapeHtml(str) { 
-        return String(str || '').replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
-    }
+        window.deleteLevel = async function(id) {
+            if (!confirm('Səviyyəni silmək?')) return;
+            await supabaseClient.from('levels').delete().eq('id', id);
+            await loadLevels();
+            showToast('✅ Səviyyə silindi!');
+        };
 
-    document.getElementById('addWordBtn')?.addEventListener('click', addWord);
-    document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
-    document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
-    document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
-    document.getElementById('closeModalBtn')?.addEventListener('click', () => document.getElementById('editModal').classList.remove('active'));
-    searchInput?.addEventListener('input', (e) => { currentPage = 1; loadWords(e.target.value); });
+        // Kateqoriyalar
+        async function loadCategories() {
+            try {
+                const { data, error } = await supabaseClient.from('categories').select('*').order('display_order');
+                if (error) throw error;
+                categories = data || [];
+                
+                const container = document.getElementById('categoriesList');
+                if (container) {
+                    if (categories.length === 0) {
+                        container.innerHTML = '<p>Heç bir kateqoriya yoxdur</p>';
+                        document.getElementById('categoryCount').innerText = '0 kateqoriya';
+                    } else {
+                        let html = '';
+                        categories.forEach((c, idx) => {
+                            html += `<div class="list-item">
+                                <div class="list-item-name"><span class="order-number">${idx + 1}</span> ${escapeHtml(c.name)}</div>
+                                <div class="list-item-actions"><i class="fas fa-trash" onclick="deleteCategory(${c.id}, '${escapeHtml(c.name)}')" style="color:#dc3545"></i></div>
+                            </div>`;
+                        });
+                        container.innerHTML = html;
+                        document.getElementById('categoryCount').innerText = categories.length + ' kateqoriya';
+                    }
+                }
+                
+                // Həm mobil dropdown, həm də kompüter butonlarını doldur
+                const categorySelectMobile = document.getElementById('category_select_mobile');
+                const categoryButtons = document.getElementById('category_buttons');
+                
+                if (categorySelectMobile) {
+                    let options = '<option value="all">Bütün kateqoriyalar</option>';
+                    categories.forEach(c => { options += `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`; });
+                    options += '<option value="Əsas">Əsas</option>';
+                    categorySelectMobile.innerHTML = options;
+                    categorySelectMobile.value = selectedCategory;
+                    categorySelectMobile.onchange = (e) => { selectedCategory = e.target.value; currentPage = 1; loadWords(); };
+                }
+                
+                if (categoryButtons) {
+                    let buttons = `<button class="filter-btn ${selectedCategory === "all" ? "active" : ""}" data-category="all">Bütün</button>`;
+                    categories.forEach(c => {
+                        buttons += `<button class="filter-btn ${selectedCategory === c.name ? "active" : ""}" data-category="${escapeHtml(c.name)}">${escapeHtml(c.name)}</button>`;
+                    });
+                    buttons += `<button class="filter-btn ${selectedCategory === "Əsas" ? "active" : ""}" data-category="Əsas">Əsas</button>`;
+                    categoryButtons.innerHTML = buttons;
+                    
+                    categoryButtons.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.onclick = () => {
+                            selectedCategory = btn.dataset.category;
+                            currentPage = 1;
+                            loadWords();
+                            updateCategoryButtons();
+                        };
+                    });
+                }
+            } catch(e) {
+                console.error('Kateqoriya xətası:', e);
+            }
+        }
+        
+        function updateCategoryButtons() {
+            document.querySelectorAll('#category_buttons .filter-btn').forEach(btn => {
+                if (btn.dataset.category === selectedCategory) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+        window.addCategory = async function() {
+            const name = document.getElementById('newCategory').value.trim();
+            if (!name) { showToast('Kateqoriya adı daxil edin!', true); return; }
+            const { error } = await supabaseClient.from('categories').insert([{ name, display_order: categories.length + 1 }]);
+            if (error) { showToast('Xəta: ' + error.message, true); return; }
+            document.getElementById('newCategory').value = '';
+            await loadCategories();
+            showToast('✅ Kateqoriya əlavə edildi!');
+        };
+
+        window.deleteCategory = async function(id, name) {
+            if (!confirm(`"${name}" kateqoriyasını silmək?`)) return;
+            await supabaseClient.from('categories').delete().eq('id', id);
+            await supabaseClient.from('words').update({ category: 'Əsas' }).eq('category', name);
+            await loadCategories();
+            await loadWords();
+            showToast('✅ Kateqoriya silindi!');
+        };
+
+        // Parametrlər
+        async function loadSettings() {
+            const { data } = await supabaseClient.from('site_settings').select('*').limit(1);
+            if (data && data[0]) {
+                document.getElementById('siteName').value = data[0].site_name || '';
+                document.getElementById('siteSubtitle').value = data[0].site_subtitle || '';
+                document.getElementById('creatorName').value = data[0].creator_name || '';
+                document.getElementById('footerText').value = data[0].footer_text || '';
+                document.getElementById('instagramUrl').value = data[0].instagram_url || '';
+                document.getElementById('tiktokUrl').value = data[0].tiktok_url || '';
+                document.getElementById('youtubeUrl').value = data[0].youtube_url || '';
+                if (data[0].admin_codes) document.getElementById('adminCodes').value = data[0].admin_codes.join(', ');
+            }
+        }
+
+        window.saveSettings = async function() {
+            const { data: existing } = await supabaseClient.from('site_settings').select('id').limit(1);
+            const adminCodesStr = document.getElementById('adminCodes').value;
+            const adminCodesArray = adminCodesStr.split(',').map(c => c.trim()).filter(c => c);
+            const settingsData = {
+                site_name: document.getElementById('siteName').value,
+                site_subtitle: document.getElementById('siteSubtitle').value,
+                creator_name: document.getElementById('creatorName').value,
+                footer_text: document.getElementById('footerText').value,
+                instagram_url: document.getElementById('instagramUrl').value,
+                tiktok_url: document.getElementById('tiktokUrl').value,
+                youtube_url: document.getElementById('youtubeUrl').value,
+                admin_codes: adminCodesArray,
+                updated_at: new Date()
+            };
+            if (existing && existing[0]) {
+                await supabaseClient.from('site_settings').update(settingsData).eq('id', existing[0].id);
+            } else {
+                await supabaseClient.from('site_settings').insert([settingsData]);
+            }
+            showToast('✅ Parametrlər yadda saxlandı!');
+        };
+
+        // Event listenerlər
+        document.getElementById('addWordBtn').onclick = () => window.addWord();
+        document.getElementById('addLevelBtn').onclick = () => window.addLevel();
+        document.getElementById('addCategoryBtn').onclick = () => window.addCategory();
+        document.getElementById('saveSettingsBtn').onclick = () => window.saveSettings();
+        document.getElementById('closeModalBtn').onclick = () => document.getElementById('editModal').classList.remove('active');
+        
+        document.getElementById('saveEditBtn').onclick = async () => {
+            const newId = parseInt(document.getElementById('edit_id').value);
+            const oldId = currentEditId;
+            if (newId !== oldId) {
+                await supabaseClient.from('words').delete().eq('id', oldId);
+                await supabaseClient.from('words').insert([{
+                    id: newId,
+                    az: document.getElementById('edit_az').value,
+                    en: document.getElementById('edit_en').value,
+                    en_read: document.getElementById('edit_en_read').value,
+                    ru: document.getElementById('edit_ru').value,
+                    de: document.getElementById('edit_de').value,
+                    es: document.getElementById('edit_es').value,
+                    pt: document.getElementById('edit_pt').value,
+                    tr: document.getElementById('edit_tr').value,
+                    zh: document.getElementById('edit_zh').value,
+                    level: document.getElementById('edit_level').value,
+                    category: document.getElementById('edit_category').value,
+                    created_at: new Date()
+                }]);
+                showToast('✅ ID dəyişdirildi!');
+            } else {
+                await supabaseClient.from('words').update({
+                    az: document.getElementById('edit_az').value,
+                    en: document.getElementById('edit_en').value,
+                    en_read: document.getElementById('edit_en_read').value,
+                    ru: document.getElementById('edit_ru').value,
+                    de: document.getElementById('edit_de').value,
+                    es: document.getElementById('edit_es').value,
+                    pt: document.getElementById('edit_pt').value,
+                    tr: document.getElementById('edit_tr').value,
+                    zh: document.getElementById('edit_zh').value,
+                    level: document.getElementById('edit_level').value,
+                    category: document.getElementById('edit_category').value
+                }).eq('id', oldId);
+                showToast('✅ Söz yeniləndi!');
+            }
+            document.getElementById('editModal').classList.remove('active');
+            await loadWords();
+        };
+        
+        document.getElementById('searchWord').oninput = (e) => { currentPage = 1; loadWords(e.target.value); };
+        document.getElementById('viewSiteBtn').onclick = (e) => { e.preventDefault(); window.open('index.html', '_blank'); };
+
+        // Ekran ölçüsü dəyişdikdə
+        window.addEventListener('resize', () => {
+            // Seçilmiş dəyərləri sinxronizasiya et
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                const mobileLevel = document.getElementById('level_select_mobile');
+                const mobileCategory = document.getElementById('category_select_mobile');
+                if (mobileLevel) mobileLevel.value = selectedLevel;
+                if (mobileCategory) mobileCategory.value = selectedCategory;
+            }
         });
-    });
 
-    let dark = localStorage.getItem('adminDark') === 'true';
-    if (dark) document.body.classList.add('dark');
-    document.getElementById('themeToggle').onclick = () => {
-        document.body.classList.toggle('dark');
-        localStorage.setItem('adminDark', document.body.classList.contains('dark'));
-    };
+        // Qaranlıq rejim
+        const isDark = localStorage.getItem('adminDark') === 'true';
+        if (isDark) document.body.classList.add('dark');
+        document.getElementById('themeToggle').onclick = () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('adminDark', document.body.classList.contains('dark'));
+        };
 
-    checkAccessCode();
+        checkLogin();
+    })();
 </script>
 </body>
 </html>

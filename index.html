@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
             --bg: #f0f2f5;
             --card: #ffffff;
@@ -19,7 +18,6 @@
             --success: #28a745;
             --border: #dee2e6;
         }
-
         body.dark {
             --bg: #1a1a2e;
             --card: #16213e;
@@ -27,7 +25,6 @@
             --text-light: #aaa;
             --border: #2c3e50;
         }
-
         body {
             background: var(--bg);
             font-family: 'Inter', system-ui, sans-serif;
@@ -35,9 +32,7 @@
             padding: 20px;
             min-height: 100vh;
         }
-
         .container { max-width: 1400px; margin: 0 auto; }
-
         .login-overlay {
             position: fixed;
             top: 0;
@@ -72,7 +67,6 @@
             margin-bottom: 20px;
         }
         .login-card .error { color: var(--danger); margin-bottom: 15px; display: none; }
-
         .header {
             background: var(--card);
             border-radius: 20px;
@@ -102,9 +96,7 @@
         .status-led.connected { background: var(--success); }
         .status-led.disconnected { background: var(--danger); }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
         .view-site { background: var(--primary); color: #1e2a36; padding: 10px 20px; border-radius: 40px; text-decoration: none; font-weight: bold; }
-
         .tabs {
             display: flex;
             flex-wrap: wrap;
@@ -127,7 +119,6 @@
         .tab-btn.active { background: var(--primary); color: #1e2a36; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
         .card {
             background: var(--card);
             border-radius: 24px;
@@ -136,7 +127,6 @@
             border: 1px solid var(--border);
         }
         .card h3 { margin-bottom: 20px; color: var(--primary); }
-
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; }
         input, select, textarea {
@@ -151,7 +141,6 @@
         }
         textarea { border-radius: 20px; }
         input:focus, select:focus { border-color: var(--primary); }
-
         .btn {
             padding: 10px 24px;
             border-radius: 40px;
@@ -163,14 +152,12 @@
         .btn-primary { background: var(--primary); color: #1e2a36; }
         .btn-danger { background: var(--danger); color: white; }
         .btn:hover { transform: scale(1.02); opacity: 0.9; }
-
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
         th { background: var(--bg); }
         .action-icons i { margin: 0 5px; cursor: pointer; opacity: 0.7; transition: all 0.2s; }
         .action-icons i:hover { opacity: 1; transform: scale(1.1); }
-
         .modal {
             position: fixed;
             top: 0;
@@ -197,7 +184,6 @@
             overflow-y: auto;
         }
         .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 25px; }
-
         .alert {
             position: fixed;
             top: 20px;
@@ -215,7 +201,6 @@
         }
         .alert.show { transform: translateX(0); }
         .alert.error { background: var(--danger); }
-
         .theme-toggle {
             position: fixed;
             bottom: 20px;
@@ -232,11 +217,9 @@
             justify-content: center;
             z-index: 1000;
         }
-
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
         .page-btn { padding: 6px 12px; border-radius: 40px; background: var(--bg); border: none; cursor: pointer; }
         .page-btn.active { background: var(--primary); color: #1e2a36; }
-
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
         hr { margin: 15px 0; border-color: var(--border); }
@@ -349,7 +332,6 @@
     const wordsPerPage = 20;
     let editType = null;
     let editId = null;
-    let isConnected = false;
 
     async function checkAccessCode() {
         const savedCode = localStorage.getItem('admin_access_code');
@@ -403,12 +385,10 @@
             if (!error) {
                 statusLed.className = 'status-led connected';
                 statusText.innerHTML = '✅ Bağlı';
-                isConnected = true;
             } else throw new Error();
         } catch(e) {
             statusLed.className = 'status-led disconnected';
             statusText.innerHTML = '❌ Bağlı deyil';
-            isConnected = false;
         }
     }
 
@@ -462,7 +442,6 @@
 
     document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
 
-    // LEVELS
     async function loadLevels() {
         const { data } = await supabaseClient.from('levels').select('*').order('display_order');
         levels = data || [];
@@ -492,7 +471,7 @@
 
     document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
 
-    // CATEGORIES - DÜZƏLDİLDİ! İndi categories cədvəlindən çəkir
+    // CATEGORIES - Birbaşa categories cədvəlindən
     async function loadCategories() {
         const { data } = await supabaseClient.from('categories').select('*').order('display_order');
         categories = data || [];
@@ -524,9 +503,9 @@
 
     document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
 
-    // WORDS
+    // WORDS - JOINsiz, sadəcə words cədvəli
     async function loadWords(search = '') {
-        let query = supabaseClient.from('words').select('*, categories(name)').order('created_at', { ascending: false });
+        let query = supabaseClient.from('words').select('*').order('created_at', { ascending: false });
         if (search) query = query.ilike('az', `%${search}%`);
         const { data } = await query;
         words = data || [];
@@ -538,7 +517,7 @@
         const pageWords = words.slice(start, start + wordsPerPage);
         const container = document.getElementById('wordsList');
         if (pageWords.length === 0) { container.innerHTML = '<p>Heç bir söz yoxdur</p>'; renderPagination(0); return; }
-        container.innerHTML = `<table><thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead><tbody>${pageWords.map(w => `<tr><td>${w.id}</td><td>${escapeHtml(w.az)}</td><td>${escapeHtml(w.en)}</td><td>${escapeHtml(w.level || '-')}</td><td>${escapeHtml(w.categories?.name || w.category || '-')}</td><td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>`).join('')}</tbody></table>`;
+        container.innerHTML = `<table><thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead><tbody>${pageWords.map(w => `<tr><td>${w.id}</td><td>${escapeHtml(w.az)}</td><td>${escapeHtml(w.en)}</td><td>${escapeHtml(w.level || '-')}</td><td>${escapeHtml(w.category || '-')}</td><td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>`).join('')}</tbody></table>`;
         renderPagination(words.length);
     }
 
@@ -561,17 +540,11 @@
         if (!az || !en) { showAlert('Azərbaycanca və İngiliscə daxil edin!', true); return; }
         
         const selectedCategory = document.getElementById('wordCategory').value;
-        let categoryId = null;
-        if (selectedCategory) {
-            const cat = categories.find(c => c.name === selectedCategory);
-            categoryId = cat ? cat.id : null;
-        }
         
         await supabaseClient.from('words').insert([{
             az, en, 
             en_read: document.getElementById('wordEnRead').value.trim() || en.toLowerCase(),
             level: document.getElementById('wordLevel').value || null,
-            category_id: categoryId,
             category: selectedCategory || null,
             created_at: new Date()
         }]);
@@ -642,17 +615,11 @@
     document.getElementById('saveEditBtn').onclick = async () => {
         if (editType === 'word') {
             const selectedCategory = document.getElementById('editCategory').value;
-            let categoryId = null;
-            if (selectedCategory) {
-                const cat = categories.find(c => c.name === selectedCategory);
-                categoryId = cat ? cat.id : null;
-            }
             await supabaseClient.from('words').update({
                 az: document.getElementById('editAz').value,
                 en: document.getElementById('editEn').value,
                 en_read: document.getElementById('editEnRead').value,
                 level: document.getElementById('editLevel').value,
-                category_id: categoryId,
                 category: selectedCategory || null,
                 ru: document.getElementById('editRu').value || null,
                 ru_read: document.getElementById('editRuRead').value || null,

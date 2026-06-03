@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>Admin Panel - Dil Öyrən</title>
-        <link rel="icon" href="https://cdn-icons-png.flaticon.com/32/197/197374.png" type="image/png">
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -83,7 +81,6 @@
         .admin-container { display: none; max-width: 1400px; margin: 0 auto; }
         .admin-container.visible { display: block; }
         
-        /* Header */
         .header {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
@@ -103,7 +100,7 @@
         .view-site { background: linear-gradient(135deg, #f5a623, #ff8c42); color: #1e2a36; padding: 6px 14px; border-radius: 40px; text-decoration: none; font-weight: bold; font-size: 0.75rem; transition: transform 0.2s; }
         .view-site:hover { transform: scale(1.05); }
         
-        /* Stats Cards - Premium Rəngli Dizayn */
+        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -146,7 +143,6 @@
         .stat-card .stat-value { font-size: 32px; font-weight: 800; margin: 8px 0; letter-spacing: 1px; }
         .stat-card .stat-label { font-size: 12px; opacity: 0.9; font-weight: 500; }
         
-        /* Chart Cards */
         .chart-card {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
@@ -162,7 +158,6 @@
         .chart-card h4 { margin-bottom: 16px; color: #f5a623; font-size: 16px; display: flex; align-items: center; gap: 8px; }
         canvas { max-height: 280px; width: 100% !important; }
         
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 8px;
@@ -226,9 +221,10 @@
         .btn-danger { background: linear-gradient(135deg, #dc3545, #c82333); color: white; }
         .btn-warning { background: linear-gradient(135deg, #ffc107, #e0a800); color: #1e2a36; }
         .btn:hover { transform: scale(1.02); opacity: 0.95; }
+        .btn-sm { padding: 8px 16px; font-size: 0.75rem; width: auto; }
         
         .table-wrapper { overflow-x: auto; margin: 0 -8px; padding: 0 8px; }
-        table { width: 100%; border-collapse: collapse; min-width: 650px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
         th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem; }
         body.dark th, body.dark td { border-color: #334155; }
         th { background: linear-gradient(135deg, #f8fafc, #f1f5f9); font-weight: 600; }
@@ -244,7 +240,7 @@
         .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
         @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
         
-        .category-badge {
+        .level-badge {
             background: linear-gradient(135deg, #f5a62320, #ff8c4220);
             color: #f5a623;
             padding: 4px 12px;
@@ -253,6 +249,10 @@
             display: inline-block;
             font-weight: 600;
         }
+        .level-badge-baslangic { background: linear-gradient(135deg, #28a74520, #20c99720); color: #28a745; }
+        .level-badge-orta { background: linear-gradient(135deg, #f5a62320, #ff8c4220); color: #f5a623; }
+        .level-badge-qabacil { background: linear-gradient(135deg, #fd7e1420, #f39c1220); color: #fd7e14; }
+        .level-badge-pesekar { background: linear-gradient(135deg, #dc354520, #c8233320); color: #dc3545; }
         
         .filter-bar {
             display: flex;
@@ -266,7 +266,7 @@
             border-radius: 16px;
         }
         body.dark .filter-bar { background: rgba(255,255,255,0.03); }
-        .filter-select { flex: 1; min-width: 180px; }
+        .filter-select { flex: 1; min-width: 150px; }
         
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -279,7 +279,7 @@
         .modal-overlay.active { visibility: visible; opacity: 1; }
         .modal-content {
             background: white; border-radius: 28px; padding: 24px;
-            width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto;
+            width: 90%; max-width: 750px; max-height: 85vh; overflow-y: auto;
         }
         body.dark .modal-content { background: #1e293b; }
         
@@ -378,7 +378,6 @@
         .sortable-row { transition: all 0.2s; }
         .sortable-ghost { opacity: 0.4; background: #f5a62330; }
         
-        /* Toplu silmə bölməsi */
         .delete-all-section {
             background: linear-gradient(135deg, #fee2e2, #fecaca);
             border-radius: 20px;
@@ -386,10 +385,7 @@
             margin-bottom: 20px;
             border: 1px solid #fca5a5;
         }
-        body.dark .delete-all-section {
-            background: linear-gradient(135deg, #450a0a, #7f1d1d);
-            border-color: #dc2626;
-        }
+        body.dark .delete-all-section { background: linear-gradient(135deg, #450a0a, #7f1d1d); border-color: #dc2626; }
         .delete-category-section {
             background: linear-gradient(135deg, #fff3e0, #ffe0b2);
             border-radius: 20px;
@@ -397,10 +393,7 @@
             margin-bottom: 20px;
             border: 1px solid #ffcc80;
         }
-        body.dark .delete-category-section {
-            background: linear-gradient(135deg, #3e2a1f, #5c3d1a);
-            border-color: #f5a623;
-        }
+        body.dark .delete-category-section { background: linear-gradient(135deg, #3e2a1f, #5c3d1a); border-color: #f5a623; }
         
         .stat-detail-card {
             background: rgba(0,0,0,0.03);
@@ -466,7 +459,7 @@
 
     <!-- STATİSTİKA TABI -->
     <div id="stats-tab" class="tab-content">
-        <div class="stats-grid" id="statsGrid">
+        <div class="stats-grid">
             <div class="stat-card" id="statTotalWords">
                 <i class="fas fa-book"></i>
                 <div class="stat-value" id="totalWords">0</div>
@@ -500,7 +493,7 @@
         </div>
 
         <div class="chart-card">
-            <h4><i class="fas fa-chart-bar" style="color: #f5a623;"></i> Kateqoriyalara görə sözlər (Top 15)</h4>
+            <h4><i class="fas fa-chart-bar"></i> Kateqoriyalara görə sözlər (Top 15)</h4>
             <canvas id="categoriesBarChart" width="400" height="280"></canvas>
         </div>
 
@@ -516,7 +509,7 @@
         </div>
     </div>
 
-    <!-- Sözlər Tabı -->
+    <!-- Sözlər Tabı - Səviyyə seçimi əlavə edildi -->
     <div id="words-tab" class="tab-content active">
         <div class="card">
             <h3>➕ Yeni Söz Əlavə Et</h3>
@@ -526,7 +519,7 @@
                 <div class="grid-2">
                     <div class="form-group"><label>Azərbaycanca *</label><input type="text" id="az" placeholder="salam"></div>
                     <div class="form-group"><label>İngiliscə *</label><input type="text" id="en" placeholder="hello"></div>
-                    <div class="form-group"><label>Oxunuş</label><input type="text" id="en_read" placeholder="hələʊ"></div>
+                    <div class="form-group"><label>🔊 Oxunuş</label><input type="text" id="en_read" placeholder="hələʊ"></div>
                 </div>
             </div>
             
@@ -555,9 +548,21 @@
                 <div class="grid-2"><input type="text" id="zh" placeholder="你好"><input type="text" id="zh_read" placeholder="ni hao"></div>
             </div>
             
-            <div class="form-group">
-                <label>🏷️ Kateqoriya</label>
-                <select id="category_select"></select>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>📚 Səviyyə</label>
+                    <select id="level_select">
+                        <option value="Başlanğıc">🌱 Başlanğıc</option>
+                        <option value="Orta" selected>⚡ Orta</option>
+                        <option value="Qabaqcıl">📈 Qabaqcıl</option>
+                        <option value="Peşəkar">🏆 Peşəkar</option>
+                    </select>
+                    <small style="font-size: 10px; color: #888;">Seçilməzsə "Orta" qeyd olunacaq</small>
+                </div>
+                <div class="form-group">
+                    <label>🏷️ Kateqoriya</label>
+                    <select id="category_select"></select>
+                </div>
             </div>
             
             <button class="btn btn-primary" id="addWordBtn"><i class="fas fa-save"></i> Sözü Yadda Saxla</button>
@@ -569,6 +574,15 @@
                 <div class="filter-select">
                     <select id="categoryFilterSelect">
                         <option value="all">📌 Bütün kateqoriyalar</option>
+                    </select>
+                </div>
+                <div class="filter-select">
+                    <select id="levelFilterSelect">
+                        <option value="all">📚 Bütün səviyyələr</option>
+                        <option value="Başlanğıc">🌱 Başlanğıc</option>
+                        <option value="Orta">⚡ Orta</option>
+                        <option value="Qabaqcıl">📈 Qabaqcıl</option>
+                        <option value="Peşəkar">🏆 Peşəkar</option>
                     </select>
                 </div>
                 <button class="btn btn-sm" id="clearFilterBtn" style="background:#e2e8f0"><i class="fas fa-times"></i> Təmizlə</button>
@@ -584,7 +598,9 @@
             <div class="word-count" id="wordCount">0 söz</div>
             <div class="table-wrapper">
                 <table>
-                    <thead><tr><th style="width:30px"></th><th>#</th><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead>
+                    <thead>
+                        <tr><th style="width:30px"></th><th>#</th><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr>
+                    </thead>
                     <tbody id="wordsList"></tbody>
                 </table>
             </div>
@@ -594,14 +610,12 @@
 
     <!-- Kateqoriyalar Tabı -->
     <div id="categories-tab" class="tab-content">
-        <!-- BÜTÜN SÖZLƏRİ SİL BÖLMƏSİ -->
         <div class="delete-all-section">
             <h4><i class="fas fa-exclamation-triangle"></i> ⚠️ Təhlükəli Əməliyyat</h4>
-            <p style="margin-bottom: 16px; font-size: 14px;">Bütün sözləri birdən silmək istəyirsinizsə, aşağıdakı düyməni istifadə edin. Bu əməliyyat geri alına bilməz!</p>
+            <p style="margin-bottom: 16px; font-size: 14px;">Bütün sözləri birdən silmək istəyirsinizsə, aşağıdakı düyməni istifadə edin.</p>
             <button class="btn btn-danger" id="deleteAllWordsCategoryBtn" style="width: auto; padding: 12px 30px;"><i class="fas fa-trash-alt"></i> 🗑️ BÜTÜN SÖZLƏRİ SİL</button>
         </div>
         
-        <!-- KATEQORİYA SEÇİB SİLMƏ BÖLMƏSİ -->
         <div class="delete-category-section">
             <h4><i class="fas fa-folder-open"></i> Kateqoriya Seçərək Toplu Silmə</h4>
             <div class="grid-2">
@@ -619,7 +633,6 @@
             <div class="info-text"><i class="fas fa-info-circle"></i> Bu əməliyyat seçdiyiniz kateqoriyadakı BÜTÜN sözləri siləcək!</div>
         </div>
         
-        <!-- KATEQORİYA ADINI DƏYİŞMƏ BÖLMƏSİ -->
         <div class="card">
             <h3>✏️ Kateqoriya Adını Dəyiş</h3>
             <div class="grid-2">
@@ -674,7 +687,7 @@
 <!-- Redaktə Modalı -->
 <div id="editModal" class="modal-overlay">
     <div class="modal-content">
-        <h3>✏️ Sözü Redaktə Et (Bütün dillər)</h3>
+        <h3>✏️ Sözü Redaktə Et</h3>
         <div id="editForm"></div>
         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
             <button class="btn btn-primary btn-sm" id="saveEditBtn">Yadda Saxla</button>
@@ -694,13 +707,13 @@
         let currentPage = 1;
         let searchQuery = "";
         let selectedCategoryFilter = "all";
+        let selectedLevelFilter = "all";
         const itemsPerPage = 20;
         let currentEditId = null;
         let validCodes = ['12345', 'admin123'];
         let sortableInstance = null;
         let barChart = null;
         
-        // Toast
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toastMessage');
@@ -713,6 +726,16 @@
         function escapeHtml(str) {
             if (!str) return '';
             return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+        }
+        
+        function getLevelClass(level) {
+            switch(level) {
+                case 'Başlanğıc': return 'level-badge-baslangic';
+                case 'Orta': return 'level-badge-orta';
+                case 'Qabaqcıl': return 'level-badge-qabacil';
+                case 'Peşəkar': return 'level-badge-pesekar';
+                default: return 'level-badge';
+            }
         }
         
         // Giriş
@@ -778,20 +801,12 @@
             allWords.forEach(w => {
                 const cat = w.category || 'Əsas';
                 categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
-                
-                if (w.az && w.az.length > longestWord.length) {
-                    longestWord = { word: w.az, length: w.az.length };
-                }
-                if (w.az && w.az.length < shortestWord.length) {
-                    shortestWord = { word: w.az, length: w.az.length };
-                }
+                if (w.az && w.az.length > longestWord.length) { longestWord = { word: w.az, length: w.az.length }; }
+                if (w.az && w.az.length < shortestWord.length) { shortestWord = { word: w.az, length: w.az.length }; }
             });
             
-            const uniqueCategories = [...categoryMap.keys()];
-            const totalCategories = uniqueCategories.length;
-            
-            let topCategory = '-';
-            let topCount = 0;
+            const totalCategories = categoryMap.size;
+            let topCategory = '-', topCount = 0;
             for (const [cat, count] of categoryMap) {
                 if (count > topCount) { topCount = count; topCategory = cat; }
             }
@@ -825,66 +840,30 @@
         
         function updateBarChart(categoryMap) {
             const sorted = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-            const labels = sorted.map(c => c[0].length > 15 ? c[0].substring(0, 12) + '...' : c[0]);
-            const data = sorted.map(c => c[1]);
-            
             if (barChart) barChart.destroy();
             const ctx = document.getElementById('categoriesBarChart').getContext('2d');
             barChart = new Chart(ctx, {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Söz sayı',
-                        data: data,
-                        backgroundColor: 'rgba(245, 166, 35, 0.7)',
-                        borderColor: '#f5a623',
-                        borderWidth: 2,
-                        borderRadius: 8,
-                        barPercentage: 0.7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#e2e8f0' }, title: { display: true, text: 'Söz sayı' } } }
-                }
+                data: { labels: sorted.map(c => c[0].length > 15 ? c[0].substring(0,12)+'...' : c[0]), datasets: [{ label: 'Söz sayı', data: sorted.map(c => c[1]), backgroundColor: 'rgba(245,166,35,0.7)', borderColor: '#f5a623', borderWidth: 2, borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true } } }
             });
         }
         
         function updateTopBottomLists(categoryMap) {
-            const sorted = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
-            const top5 = sorted.slice(0, 5);
+            const sorted = [...categoryMap.entries()].sort((a,b) => b[1] - a[1]);
+            const top5 = sorted.slice(0,5);
             const bottom5 = sorted.slice(-5).reverse();
-            
-            const topContainer = document.getElementById('topCategoriesList');
-            const bottomContainer = document.getElementById('bottomCategoriesList');
-            
-            if (topContainer) {
-                topContainer.innerHTML = top5.map(([cat, count]) => `
-                    <div class="stat-list-item">
-                        <span class="stat-list-label">${escapeHtml(cat)}</span>
-                        <span class="stat-list-value" style="color:#28a745">${count} söz</span>
-                    </div>
-                `).join('');
-            }
-            if (bottomContainer) {
-                bottomContainer.innerHTML = bottom5.map(([cat, count]) => `
-                    <div class="stat-list-item">
-                        <span class="stat-list-label">${escapeHtml(cat)}</span>
-                        <span class="stat-list-value" style="color:#dc3545">${count} söz</span>
-                    </div>
-                `).join('');
-            }
+            document.getElementById('topCategoriesList').innerHTML = top5.map(([cat,count]) => `<div class="stat-list-item"><span class="stat-list-label">${escapeHtml(cat)}</span><span class="stat-list-value" style="color:#28a745">${count} söz</span></div>`).join('');
+            document.getElementById('bottomCategoriesList').innerHTML = bottom5.map(([cat,count]) => `<div class="stat-list-item"><span class="stat-list-label">${escapeHtml(cat)}</span><span class="stat-list-value" style="color:#dc3545">${count} söz</span></div>`).join('');
         }
         
-        // SÖZLƏR
+        // SÖZLƏR - səviyyə filtri ilə
         async function loadWords() {
             try {
                 let query = supabaseClient.from('words').select('*');
                 if (searchQuery) query = query.ilike('az', `%${searchQuery}%`);
                 if (selectedCategoryFilter !== "all") query = query.eq('category', selectedCategoryFilter);
+                if (selectedLevelFilter !== "all") query = query.eq('level', selectedLevelFilter);
                 const { data, error } = await query;
                 if (error) throw error;
                 allWords = data || [];
@@ -892,16 +871,8 @@
                 const savedOrder = localStorage.getItem('word_order');
                 if (savedOrder) {
                     const orderIds = JSON.parse(savedOrder);
-                    allWords.sort((a, b) => {
-                        const indexA = orderIds.indexOf(a.id);
-                        const indexB = orderIds.indexOf(b.id);
-                        if (indexA === -1) return 1;
-                        if (indexB === -1) return -1;
-                        return indexA - indexB;
-                    });
-                } else {
-                    allWords.sort((a, b) => a.id - b.id);
-                }
+                    allWords.sort((a,b) => { const ia = orderIds.indexOf(a.id), ib = orderIds.indexOf(b.id); if(ia===-1) return 1; if(ib===-1) return -1; return ia-ib; });
+                } else { allWords.sort((a,b) => a.id - b.id); }
                 
                 document.getElementById('wordCount').innerText = allWords.length + ' söz';
                 renderWords();
@@ -917,12 +888,7 @@
             const pageWords = allWords.slice(start, start + itemsPerPage);
             const container = document.getElementById('wordsList');
             if (!container) return;
-            
-            if (pageWords.length === 0) {
-                container.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px">📭 Heç bir söz yoxdur</td></tr>';
-                document.getElementById('pagination').innerHTML = '';
-                return;
-            }
+            if (pageWords.length === 0) { container.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px">📭 Heç bir söz yoxdur</td></tr>'; document.getElementById('pagination').innerHTML = ''; return; }
             
             container.innerHTML = '';
             pageWords.forEach((w, idx) => {
@@ -932,74 +898,43 @@
                 row.innerHTML = `
                     <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
                     <td>${start + idx + 1}</td>
-                    <td><span class="category-badge">${w.id}</span></td>
+                    <td><span class="level-badge">${w.id}</span></td>
                     <td><strong>${escapeHtml(w.az)}</strong></td>
                     <td>${escapeHtml(w.en)}</td>
+                    <td><span class="${getLevelClass(w.level || 'Orta')}">${escapeHtml(w.level || 'Orta')}</span></td>
                     <td><span class="category-badge">${escapeHtml(w.category || 'Əsas')}</span></td>
-                    <td class="action-icons">
-                        <i class="fas fa-edit" onclick="window.editWord(${w.id})"></i>
-                        <i class="fas fa-trash" onclick="window.deleteWord(${w.id})"></i>
-                    </td>
+                    <td class="action-icons"><i class="fas fa-edit" onclick="window.editWord(${w.id})"></i><i class="fas fa-trash" onclick="window.deleteWord(${w.id})"></i></td>
                 `;
                 container.appendChild(row);
             });
             
             if (sortableInstance) sortableInstance.destroy();
-            sortableInstance = new Sortable(container, {
-                animation: 300,
-                handle: '.drag-handle',
-                ghostClass: 'sortable-ghost',
-                onEnd: async function() {
-                    const rows = document.querySelectorAll('#wordsList .sortable-row');
-                    const newOrder = [];
-                    rows.forEach(row => newOrder.push(parseInt(row.getAttribute('data-id'))));
-                    localStorage.setItem('word_order', JSON.stringify(newOrder));
-                    const sortedWords = [];
-                    for (const id of newOrder) {
-                        const word = allWords.find(w => w.id === id);
-                        if (word) sortedWords.push(word);
-                    }
-                    allWords = sortedWords;
-                    renderWords();
-                    showToast('✅ Sıralama yeniləndi!');
-                }
-            });
+            sortableInstance = new Sortable(container, { animation: 300, handle: '.drag-handle', ghostClass: 'sortable-ghost', onEnd: async function() {
+                const newOrder = [...document.querySelectorAll('#wordsList .sortable-row')].map(row => parseInt(row.getAttribute('data-id')));
+                localStorage.setItem('word_order', JSON.stringify(newOrder));
+                const sortedWords = newOrder.map(id => allWords.find(w => w.id === id)).filter(w => w);
+                allWords = sortedWords; renderWords(); showToast('✅ Sıralama yeniləndi!');
+            }});
             
             const paginationDiv = document.getElementById('pagination');
             if (paginationDiv) {
                 paginationDiv.innerHTML = '';
-                const prevBtn = document.createElement('button');
-                prevBtn.textContent = '←';
-                prevBtn.className = 'page-btn';
-                prevBtn.disabled = currentPage === 1;
-                prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderWords(); } };
-                paginationDiv.appendChild(prevBtn);
-                
-                const startPage = Math.max(1, currentPage - 2);
-                const endPage = Math.min(totalPages, startPage + 4);
-                for (let i = startPage; i <= endPage; i++) {
-                    const btn = document.createElement('button');
-                    btn.textContent = i;
-                    btn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
-                    btn.onclick = () => { currentPage = i; renderWords(); };
-                    paginationDiv.appendChild(btn);
-                }
-                
-                const nextBtn = document.createElement('button');
-                nextBtn.textContent = '→';
-                nextBtn.className = 'page-btn';
-                nextBtn.disabled = currentPage === totalPages;
-                nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; renderWords(); } };
-                paginationDiv.appendChild(nextBtn);
+                const prevBtn = document.createElement('button'); prevBtn.textContent = '←'; prevBtn.className = 'page-btn'; prevBtn.disabled = currentPage === 1; prevBtn.onclick = () => { if(currentPage>1){currentPage--; renderWords();} }; paginationDiv.appendChild(prevBtn);
+                const startPage = Math.max(1, currentPage-2), endPage = Math.min(totalPages, startPage+4);
+                for(let i=startPage; i<=endPage; i++){ const btn=document.createElement('button'); btn.textContent=i; btn.className=`page-btn ${currentPage===i?'active':''}`; btn.onclick=()=>{currentPage=i; renderWords();}; paginationDiv.appendChild(btn); }
+                const nextBtn = document.createElement('button'); nextBtn.textContent = '→'; nextBtn.className = 'page-btn'; nextBtn.disabled = currentPage === totalPages; nextBtn.onclick = () => { if(currentPage<totalPages){currentPage++; renderWords();} }; paginationDiv.appendChild(nextBtn);
             }
         }
         
+        // SÖZ ƏLAVƏ ET - Səviyyə seçimi ilə
         window.addWord = async function() {
             const az = document.getElementById('az').value.trim();
             const en = document.getElementById('en').value.trim();
             if (!az || !en) { showToast('Azərbaycanca və İngiliscə daxil edin!', true); return; }
             
+            let levelValue = document.getElementById('level_select').value;
             let categoryValue = document.getElementById('category_select').value;
+            if (!levelValue) levelValue = 'Orta';
             if (!categoryValue) categoryValue = 'Əsas';
             
             const newWord = {
@@ -1017,6 +952,7 @@
                 tr_read: document.getElementById('tr_read').value || null,
                 zh: document.getElementById('zh').value || null,
                 zh_read: document.getElementById('zh_read').value || null,
+                level: levelValue,
                 category: categoryValue,
                 created_at: new Date()
             };
@@ -1024,11 +960,8 @@
             const { error } = await supabaseClient.from('words').insert([newWord]);
             if (error) { showToast('Xəta: ' + error.message, true); return; }
             
-            showToast('✅ Söz əlavə edildi!');
-            ['az', 'en', 'en_read', 'ru', 'ru_read', 'de', 'de_read', 'es', 'es_read', 'pt', 'pt_read', 'tr', 'tr_read', 'zh', 'zh_read'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
+            showToast(`✅ Söz əlavə edildi! (Səviyyə: ${levelValue})`);
+            ['az','en','en_read','ru','ru_read','de','de_read','es','es_read','pt','pt_read','tr','tr_read','zh','zh_read'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
             await loadWords();
             await loadCategories();
         };
@@ -1036,38 +969,30 @@
         window.deleteWord = async function(id) {
             if (!confirm('Bu sözü silmək?')) return;
             await supabaseClient.from('words').delete().eq('id', id);
-            await loadWords();
-            await loadCategories();
+            await loadWords(); await loadCategories();
             showToast('✅ Söz silindi!');
         };
         
-        // BÜTÜN SÖZLƏRİ SİL
         async function deleteAllWords() {
-            if (!confirm('⚠️ BÜTÜN SÖZLƏRİ silmək istədiyinizdən əminsiniz? Bu əməliyyat geri alına bilməz!')) return;
-            const { error } = await supabaseClient.from('words').delete().neq('id', 0);
-            if (error) { showToast('Xəta: ' + error.message, true); return; }
+            if (!confirm('⚠️ BÜTÜN SÖZLƏRİ silmək istədiyinizdən əminsiniz?')) return;
+            await supabaseClient.from('words').delete().neq('id', 0);
             localStorage.removeItem('word_order');
-            await loadWords();
-            await loadCategories();
+            await loadWords(); await loadCategories();
             showToast('✅ Bütün sözlər silindi!');
         }
         
         document.getElementById('deleteAllWordsBtn')?.addEventListener('click', deleteAllWords);
         document.getElementById('deleteAllWordsCategoryBtn')?.addEventListener('click', deleteAllWords);
         
-        // KATEQORİYA SEÇİB SİL
         async function deleteSelectedCategory() {
             const category = document.getElementById('deleteCategorySelect').value;
             if (!category) { showToast('Kateqoriya seçin!', true); return; }
             const wordCount = allWords.filter(w => w.category === category).length;
             if (!confirm(`⚠️ "${category}" kateqoriyasındaki ${wordCount} sözü silmək istədiyinizdən əminsiniz?`)) return;
-            const { error } = await supabaseClient.from('words').delete().eq('category', category);
-            if (error) { showToast('Xəta: ' + error.message, true); return; }
-            await loadWords();
-            await loadCategories();
+            await supabaseClient.from('words').delete().eq('category', category);
+            await loadWords(); await loadCategories();
             showToast(`✅ "${category}" kateqoriyasındaki bütün sözlər silindi!`);
         }
-        
         document.getElementById('deleteSelectedCategoryBtn')?.addEventListener('click', deleteSelectedCategory);
         
         window.editWord = async function(id) {
@@ -1084,7 +1009,10 @@
                 <div class="lang-section"><div class="lang-title">🇵🇹 Portuqalca</div><div class="grid-2"><input type="text" id="edit_pt" placeholder="Tərcümə" value="${escapeHtml(word.pt || '')}"><input type="text" id="edit_pt_read" placeholder="Oxunuş" value="${escapeHtml(word.pt_read || '')}"></div></div>
                 <div class="lang-section"><div class="lang-title">🇹🇷 Türkcə</div><div class="grid-2"><input type="text" id="edit_tr" placeholder="Tərcümə" value="${escapeHtml(word.tr || '')}"><input type="text" id="edit_tr_read" placeholder="Oxunuş" value="${escapeHtml(word.tr_read || '')}"></div></div>
                 <div class="lang-section"><div class="lang-title">🇨🇳 Çincə</div><div class="grid-2"><input type="text" id="edit_zh" placeholder="Tərcümə" value="${escapeHtml(word.zh || '')}"><input type="text" id="edit_zh_read" placeholder="Oxunuş" value="${escapeHtml(word.zh_read || '')}"></div></div>
-                <div class="form-group"><label>🏷️ Kateqoriya</label><select id="edit_category">${categories.map(c => `<option value="${escapeHtml(c)}" ${word.category === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}<option value="Əsas" ${word.category === 'Əsas' ? 'selected' : ''}>Əsas</option></select></div>
+                <div class="grid-2">
+                    <div class="form-group"><label>📚 Səviyyə</label><select id="edit_level"><option value="Başlanğıc" ${word.level==='Başlanğıc' ? 'selected' : ''}>Başlanğıc</option><option value="Orta" ${word.level==='Orta' ? 'selected' : ''}>Orta</option><option value="Qabaqcıl" ${word.level==='Qabaqcıl' ? 'selected' : ''}>Qabaqcıl</option><option value="Peşəkar" ${word.level==='Peşəkar' ? 'selected' : ''}>Peşəkar</option></select></div>
+                    <div class="form-group"><label>🏷️ Kateqoriya</label><select id="edit_category">${categories.map(c => `<option value="${escapeHtml(c)}" ${word.category === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}<option value="Əsas" ${word.category === 'Əsas' ? 'selected' : ''}>Əsas</option></select></div>
+                </div>
             `;
             document.getElementById('editModal').classList.add('active');
         };
@@ -1093,24 +1021,19 @@
         async function loadCategories() {
             try {
                 const categoryMap = new Map();
-                allWords.forEach(w => {
-                    const cat = w.category || 'Əsas';
-                    categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
-                });
-                categoryStats = Array.from(categoryMap.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+                allWords.forEach(w => { const cat = w.category || 'Əsas'; categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1); });
+                categoryStats = Array.from(categoryMap.entries()).map(([name,count]) => ({ name, count })).sort((a,b) => b.count - a.count);
                 categories = categoryStats.map(c => c.name);
                 
+                const total = categoryStats.reduce((s,c) => s + c.count, 0);
                 const container = document.getElementById('categoriesList');
-                const total = categoryStats.reduce((sum, c) => sum + c.count, 0);
-                if (container) {
-                    if (categoryStats.length === 0) {
-                        container.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px">📭 Heç bir kateqoriya yoxdur</td></tr>';
-                        document.getElementById('categoryCount').innerText = '0 kateqoriya';
-                    } else {
-                        let html = '';
-                        categoryStats.forEach((cat, idx) => {
-                            const percent = total > 0 ? ((cat.count / total) * 100).toFixed(1) : 0;
-                            html += `<tr><td style="width:50px">${idx + 1}</td><td><span class="category-badge">${escapeHtml(cat.name)}</span></td><td style="width:80px">${cat.count}</td><td style="width:120px">${percent}%<div class="progress-bar"><div class="progress-fill" style="width: ${percent}%"></div></div></td></tr>`;
+                if(container){
+                    if(categoryStats.length===0) container.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px">📭 Heç bir kateqoriya yoxdur</td></tr>';
+                    else {
+                        let html='';
+                        categoryStats.forEach((cat,idx)=>{
+                            const percent = total>0 ? ((cat.count/total)*100).toFixed(1) : 0;
+                            html += `<tr><td style="width:50px">${idx+1}</td><td><span class="category-badge">${escapeHtml(cat.name)}</span></td><td style="width:80px">${cat.count}</td><td style="width:120px">${percent}%<div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div></td></tr>`;
                         });
                         container.innerHTML = html;
                         document.getElementById('categoryCount').innerText = categoryStats.length + ' kateqoriya';
@@ -1120,41 +1043,47 @@
                 const selects = ['category_select', 'oldCategorySelect', 'deleteCategorySelect', 'categoryFilterSelect'];
                 selects.forEach(selectId => {
                     const select = document.getElementById(selectId);
-                    if (select) {
-                        let options = selectId === 'categoryFilterSelect' ? '<option value="all">📌 Bütün kateqoriyalar</option>' : '<option value="">Kateqoriya seçin</option>';
-                        categories.forEach(c => { options += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`; });
-                        if (selectId !== 'categoryFilterSelect') options += '<option value="Əsas">Əsas</option>';
-                        if (selectId === 'categoryFilterSelect') options += '<option value="Əsas">Əsas</option>';
+                    if(select){
+                        let options = selectId==='categoryFilterSelect' ? '<option value="all">📌 Bütün kateqoriyalar</option>' : '<option value="">Kateqoriya seçin</option>';
+                        categories.forEach(c => options += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`);
+                        if(selectId!=='categoryFilterSelect') options += '<option value="Əsas">Əsas</option>';
+                        if(selectId==='categoryFilterSelect') options += '<option value="Əsas">Əsas</option>';
                         select.innerHTML = options;
-                        if (selectId === 'categoryFilterSelect') select.value = selectedCategoryFilter;
+                        if(selectId==='categoryFilterSelect') select.value = selectedCategoryFilter;
                     }
                 });
-            } catch(e) { console.error(e); }
+            } catch(e){ console.error(e); }
         }
         
         window.updateCategory = async function() {
-            const oldCategory = document.getElementById('oldCategorySelect').value;
-            const newCategory = document.getElementById('newCategoryName').value.trim();
-            if (!oldCategory) { showToast('Köhnə kateqoriya seçin!', true); return; }
-            if (!newCategory) { showToast('Yeni kateqoriya adı daxil edin!', true); return; }
-            if (oldCategory === newCategory) { showToast('Eyni ad!', true); return; }
-            if (!confirm(`"${oldCategory}" -> "${newCategory}" olaraq dəyişsin?`)) return;
-            const { error } = await supabaseClient.from('words').update({ category: newCategory }).eq('category', oldCategory);
-            if (error) { showToast('Xəta: ' + error.message, true); return; }
-            showToast(`✅ "${oldCategory}" -> "${newCategory}" dəyişdirildi!`);
+            const oldCat = document.getElementById('oldCategorySelect').value;
+            const newCat = document.getElementById('newCategoryName').value.trim();
+            if(!oldCat){ showToast('Köhnə kateqoriya seçin!',true); return; }
+            if(!newCat){ showToast('Yeni kateqoriya adı daxil edin!',true); return; }
+            if(oldCat===newCat){ showToast('Eyni ad!',true); return; }
+            if(!confirm(`"${oldCat}" -> "${newCat}" olaraq dəyişsin?`)) return;
+            await supabaseClient.from('words').update({ category: newCat }).eq('category', oldCat);
+            showToast(`✅ "${oldCat}" -> "${newCat}" dəyişdirildi!`);
             document.getElementById('newCategoryName').value = '';
-            await loadWords();
-            await loadCategories();
+            await loadWords(); await loadCategories();
         };
         
         document.getElementById('updateCategoryBtn').onclick = () => window.updateCategory();
-        document.getElementById('categoryFilterSelect').onchange = (e) => { selectedCategoryFilter = e.target.value; currentPage = 1; loadWords(); };
-        document.getElementById('clearFilterBtn').onclick = () => { document.getElementById('categoryFilterSelect').value = 'all'; selectedCategoryFilter = 'all'; currentPage = 1; loadWords(); };
+        document.getElementById('categoryFilterSelect').onchange = (e) => { selectedCategoryFilter = e.target.value; currentPage=1; loadWords(); };
+        document.getElementById('levelFilterSelect').onchange = (e) => { selectedLevelFilter = e.target.value; currentPage=1; loadWords(); };
+        document.getElementById('clearFilterBtn').onclick = () => {
+            document.getElementById('categoryFilterSelect').value = 'all';
+            document.getElementById('levelFilterSelect').value = 'all';
+            selectedCategoryFilter = 'all';
+            selectedLevelFilter = 'all';
+            currentPage=1;
+            loadWords();
+        };
         
         // PARAMETRLƏR
         async function loadSettings() {
             const { data } = await supabaseClient.from('site_settings').select('*').limit(1);
-            if (data && data[0]) {
+            if(data && data[0]){
                 document.getElementById('siteName').value = data[0].site_name || '';
                 document.getElementById('siteSubtitle').value = data[0].site_subtitle || '';
                 document.getElementById('creatorName').value = data[0].creator_name || '';
@@ -1162,14 +1091,14 @@
                 document.getElementById('instagramUrl').value = data[0].instagram_url || '';
                 document.getElementById('tiktokUrl').value = data[0].tiktok_url || '';
                 document.getElementById('youtubeUrl').value = data[0].youtube_url || '';
-                if (data[0].admin_codes) document.getElementById('adminCodes').value = data[0].admin_codes.join(', ');
+                if(data[0].admin_codes) document.getElementById('adminCodes').value = data[0].admin_codes.join(', ');
             }
         }
         
         window.saveSettings = async function() {
             const { data: existing } = await supabaseClient.from('site_settings').select('id').limit(1);
             const adminCodesStr = document.getElementById('adminCodes').value;
-            const adminCodesArray = adminCodesStr.split(',').map(c => c.trim()).filter(c => c);
+            const adminCodesArray = adminCodesStr.split(',').map(c=>c.trim()).filter(c=>c);
             const settingsData = {
                 site_name: document.getElementById('siteName').value,
                 site_subtitle: document.getElementById('siteSubtitle').value,
@@ -1181,7 +1110,7 @@
                 admin_codes: adminCodesArray,
                 updated_at: new Date()
             };
-            if (existing && existing[0]) await supabaseClient.from('site_settings').update(settingsData).eq('id', existing[0].id);
+            if(existing && existing[0]) await supabaseClient.from('site_settings').update(settingsData).eq('id', existing[0].id);
             else await supabaseClient.from('site_settings').insert([settingsData]);
             showToast('✅ Parametrlər yadda saxlandı!');
         };
@@ -1193,64 +1122,24 @@
         document.getElementById('saveEditBtn').onclick = async () => {
             const newId = parseInt(document.getElementById('edit_id').value);
             const oldId = currentEditId;
-            if (newId !== oldId && !isNaN(newId)) {
+            if(newId !== oldId && !isNaN(newId)){
                 await supabaseClient.from('words').delete().eq('id', oldId);
-                await supabaseClient.from('words').insert([{
-                    id: newId,
-                    az: document.getElementById('edit_az').value,
-                    en: document.getElementById('edit_en').value,
-                    en_read: document.getElementById('edit_en_read').value,
-                    ru: document.getElementById('edit_ru').value,
-                    ru_read: document.getElementById('edit_ru_read').value,
-                    de: document.getElementById('edit_de').value,
-                    de_read: document.getElementById('edit_de_read').value,
-                    es: document.getElementById('edit_es').value,
-                    es_read: document.getElementById('edit_es_read').value,
-                    pt: document.getElementById('edit_pt').value,
-                    pt_read: document.getElementById('edit_pt_read').value,
-                    tr: document.getElementById('edit_tr').value,
-                    tr_read: document.getElementById('edit_tr_read').value,
-                    zh: document.getElementById('edit_zh').value,
-                    zh_read: document.getElementById('edit_zh_read').value,
-                    category: document.getElementById('edit_category').value,
-                    created_at: new Date()
-                }]);
+                await supabaseClient.from('words').insert([{ id: newId, az: document.getElementById('edit_az').value, en: document.getElementById('edit_en').value, en_read: document.getElementById('edit_en_read').value, ru: document.getElementById('edit_ru').value, ru_read: document.getElementById('edit_ru_read').value, de: document.getElementById('edit_de').value, de_read: document.getElementById('edit_de_read').value, es: document.getElementById('edit_es').value, es_read: document.getElementById('edit_es_read').value, pt: document.getElementById('edit_pt').value, pt_read: document.getElementById('edit_pt_read').value, tr: document.getElementById('edit_tr').value, tr_read: document.getElementById('edit_tr_read').value, zh: document.getElementById('edit_zh').value, zh_read: document.getElementById('edit_zh_read').value, level: document.getElementById('edit_level').value, category: document.getElementById('edit_category').value, created_at: new Date() }]);
                 showToast('✅ ID dəyişdirildi!');
             } else {
-                await supabaseClient.from('words').update({
-                    az: document.getElementById('edit_az').value,
-                    en: document.getElementById('edit_en').value,
-                    en_read: document.getElementById('edit_en_read').value,
-                    ru: document.getElementById('edit_ru').value,
-                    ru_read: document.getElementById('edit_ru_read').value,
-                    de: document.getElementById('edit_de').value,
-                    de_read: document.getElementById('edit_de_read').value,
-                    es: document.getElementById('edit_es').value,
-                    es_read: document.getElementById('edit_es_read').value,
-                    pt: document.getElementById('edit_pt').value,
-                    pt_read: document.getElementById('edit_pt_read').value,
-                    tr: document.getElementById('edit_tr').value,
-                    tr_read: document.getElementById('edit_tr_read').value,
-                    zh: document.getElementById('edit_zh').value,
-                    zh_read: document.getElementById('edit_zh_read').value,
-                    category: document.getElementById('edit_category').value
-                }).eq('id', oldId);
+                await supabaseClient.from('words').update({ az: document.getElementById('edit_az').value, en: document.getElementById('edit_en').value, en_read: document.getElementById('edit_en_read').value, ru: document.getElementById('edit_ru').value, ru_read: document.getElementById('edit_ru_read').value, de: document.getElementById('edit_de').value, de_read: document.getElementById('edit_de_read').value, es: document.getElementById('edit_es').value, es_read: document.getElementById('edit_es_read').value, pt: document.getElementById('edit_pt').value, pt_read: document.getElementById('edit_pt_read').value, tr: document.getElementById('edit_tr').value, tr_read: document.getElementById('edit_tr_read').value, zh: document.getElementById('edit_zh').value, zh_read: document.getElementById('edit_zh_read').value, level: document.getElementById('edit_level').value, category: document.getElementById('edit_category').value }).eq('id', oldId);
                 showToast('✅ Söz yeniləndi!');
             }
             document.getElementById('editModal').classList.remove('active');
-            await loadWords();
-            await loadCategories();
+            await loadWords(); await loadCategories();
         };
         
-        document.getElementById('searchWord').oninput = (e) => { searchQuery = e.target.value; currentPage = 1; loadWords(); };
-        document.getElementById('viewSiteBtn').onclick = (e) => { e.preventDefault(); window.open('index.html', '_blank'); };
+        document.getElementById('searchWord').oninput = (e) => { searchQuery = e.target.value; currentPage=1; loadWords(); };
+        document.getElementById('viewSiteBtn').onclick = (e) => { e.preventDefault(); window.open('index.html','_blank'); };
         
         const isDark = localStorage.getItem('adminDark') === 'true';
-        if (isDark) document.body.classList.add('dark');
-        document.getElementById('themeToggle').onclick = () => {
-            document.body.classList.toggle('dark');
-            localStorage.setItem('adminDark', document.body.classList.contains('dark'));
-        };
+        if(isDark) document.body.classList.add('dark');
+        document.getElementById('themeToggle').onclick = () => { document.body.classList.toggle('dark'); localStorage.setItem('adminDark', document.body.classList.contains('dark')); };
         
         checkLogin();
     })();

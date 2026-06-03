@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Dil Öyrən</title>
+    <title>Admin Panel</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -39,7 +39,6 @@
 
         .container { max-width: 1400px; margin: 0 auto; }
 
-        /* Login Overlay */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -124,6 +123,7 @@
             font-weight: 600;
             cursor: pointer;
             color: var(--text);
+            transition: all 0.3s;
         }
         .tab-btn.active { background: var(--primary); color: #1e2a36; }
         .tab-content { display: none; }
@@ -159,16 +159,18 @@
             border: none;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s;
         }
         .btn-primary { background: var(--primary); color: #1e2a36; }
         .btn-danger { background: var(--danger); color: white; }
+        .btn:hover { transform: scale(1.02); opacity: 0.9; }
 
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
         th { background: var(--bg); }
-        .action-icons i { margin: 0 5px; cursor: pointer; opacity: 0.7; }
-        .action-icons i:hover { opacity: 1; }
+        .action-icons i { margin: 0 5px; cursor: pointer; opacity: 0.7; transition: all 0.2s; }
+        .action-icons i:hover { opacity: 1; transform: scale(1.1); }
 
         .modal {
             position: fixed;
@@ -238,6 +240,8 @@
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        hr { margin: 15px 0; border-color: var(--border); }
+        h4 { margin: 10px 0; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -259,7 +263,7 @@
                 <div class="status-led" id="statusLed"></div>
                 <span id="statusText">Yoxlanılır...</span>
             </div>
-            <a href="#" class="view-site" id="viewSiteBtn" target="_blank"><i class="fas fa-eye"></i> Sayta bax</a>
+            <a href="index.html" class="view-site" id="viewSiteBtn" target="_blank"><i class="fas fa-eye"></i> Sayta bax</a>
         </div>
     </div>
 
@@ -273,13 +277,14 @@
     <div id="settings-tab" class="tab-content active">
         <div class="card">
             <h3>Sayt Parametrləri</h3>
-            <div class="form-group"><label>Sayt Adı</label><input type="text" id="siteName"></div>
-            <div class="form-group"><label>Giriş Kodu</label><input type="text" id="accessCodeSetting" placeholder="12345"></div>
-            <div class="form-group"><label>Loqo Şəkli</label><input type="file" id="logoFile" accept="image/*"><div id="logoPreview" style="margin-top: 10px;"></div></div>
-            <div class="form-group"><label>Footer Mətni</label><textarea id="footerText" rows="2"></textarea></div>
-            <div class="form-group"><label>Instagram URL</label><input type="url" id="instagramUrl"></div>
-            <div class="form-group"><label>TikTok URL</label><input type="url" id="tiktokUrl"></div>
-            <div class="form-group"><label>YouTube URL</label><input type="url" id="youtubeUrl"></div>
+            <div class="form-group"><label>Sayt Adı</label><input type="text" id="siteName" placeholder="Dil Öyrən"></div>
+            <div class="form-group"><label>Sayt Alt Başlığı</label><input type="text" id="siteSubtitle" placeholder="7 dil | 2000+ söz"></div>
+            <div class="form-group"><label>Admin Giriş Kodu</label><input type="text" id="accessCodeSetting" placeholder="admin123"></div>
+            <div class="form-group"><label>Footer Mətni</label><textarea id="footerText" rows="2" placeholder="© 2026 rustamoff.site | Created by Rustamoff"></textarea></div>
+            <div class="form-group"><label>Yaradıcı Adı</label><input type="text" id="creatorName" placeholder="Rustamoff"></div>
+            <div class="form-group"><label>Instagram URL</label><input type="url" id="instagramUrl" placeholder="https://instagram.com/..."></div>
+            <div class="form-group"><label>TikTok URL</label><input type="url" id="tiktokUrl" placeholder="https://tiktok.com/@..."></div>
+            <div class="form-group"><label>YouTube URL</label><input type="url" id="youtubeUrl" placeholder="https://youtube.com/@..."></div>
             <button class="btn btn-primary" id="saveSettingsBtn">💾 Yadda Saxla</button>
         </div>
     </div>
@@ -298,10 +303,10 @@
         <div class="card">
             <h3>Yeni Söz</h3>
             <div class="grid-2">
-                <div class="form-group"><label>Azərbaycanca *</label><input type="text" id="wordAz"></div>
-                <div class="form-group"><label>İngiliscə *</label><input type="text" id="wordEn"></div>
+                <div class="form-group"><label>Azərbaycanca *</label><input type="text" id="wordAz" placeholder="salam"></div>
+                <div class="form-group"><label>İngiliscə *</label><input type="text" id="wordEn" placeholder="hello"></div>
             </div>
-            <div class="form-group"><label>Oxunuş (İngiliscə)</label><input type="text" id="wordEnRead"></div>
+            <div class="form-group"><label>Oxunuş (İngiliscə)</label><input type="text" id="wordEnRead" placeholder="həˈləʊ"></div>
             <div class="grid-2">
                 <div class="form-group"><label>Səviyyə</label><select id="wordLevel"></select></div>
                 <div class="form-group"><label>Kateqoriya</label><select id="wordCategory"></select></div>
@@ -348,29 +353,30 @@
     let isConnected = false;
     let isLoggedIn = false;
 
-    // Giriş kodu
     async function checkAccessCode() {
         const savedCode = localStorage.getItem('admin_access_code');
         if (savedCode) {
-            isLoggedIn = true;
-            document.getElementById('loginOverlay').classList.add('hidden');
-            document.getElementById('adminContent').style.display = 'block';
-            await initAdmin();
+            const isValid = await verifyAccessCode(savedCode);
+            if (isValid) return;
         }
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        document.getElementById('adminContent').style.display = 'none';
     }
 
     async function verifyAccessCode(code) {
         if (!supabaseClient) return false;
-        const { data } = await supabaseClient.from('site_settings').select('access_code').limit(1);
-        const validCode = data && data[0] ? data[0].access_code : '12345';
-        if (code === validCode) {
-            localStorage.setItem('admin_access_code', code);
-            isLoggedIn = true;
-            document.getElementById('loginOverlay').classList.add('hidden');
-            document.getElementById('adminContent').style.display = 'block';
-            await initAdmin();
-            return true;
-        }
+        try {
+            const { data } = await supabaseClient.from('site_settings').select('access_code').limit(1);
+            const validCode = data && data[0] ? data[0].access_code : 'admin123';
+            if (code === validCode) {
+                localStorage.setItem('admin_access_code', code);
+                isLoggedIn = true;
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('adminContent').style.display = 'block';
+                await initAdmin();
+                return true;
+            }
+        } catch(e) { console.error(e); }
         return false;
     }
 
@@ -421,60 +427,58 @@
         if (!supabaseClient) return;
         const { data } = await supabaseClient.from('site_settings').select('*').limit(1);
         if (data && data[0]) {
-            document.getElementById('siteName').value = data[0].site_name || '';
-            document.getElementById('accessCodeSetting').value = data[0].access_code || '12345';
+            document.getElementById('siteName').value = data[0].site_name || 'Dil Öyrən';
+            document.getElementById('siteSubtitle').value = data[0].site_subtitle || '7 dil | 2000+ söz';
+            document.getElementById('accessCodeSetting').value = data[0].access_code || 'admin123';
             document.getElementById('footerText').value = data[0].footer_text || '';
+            document.getElementById('creatorName').value = data[0].creator_name || 'Rustamoff';
             document.getElementById('instagramUrl').value = data[0].instagram_url || '';
             document.getElementById('tiktokUrl').value = data[0].tiktok_url || '';
             document.getElementById('youtubeUrl').value = data[0].youtube_url || '';
-            if (data[0].logo_path) {
-                document.getElementById('logoPreview').innerHTML = `<img src="${SUPABASE_URL}/storage/v1/object/public/logos/${data[0].logo_path}" style="width:50px;height:50px;border-radius:12px;">`;
-            }
         }
     }
 
     async function saveSettings() {
         const site_name = document.getElementById('siteName').value;
+        const site_subtitle = document.getElementById('siteSubtitle').value;
         const access_code = document.getElementById('accessCodeSetting').value;
         const footer_text = document.getElementById('footerText').value;
+        const creator_name = document.getElementById('creatorName').value;
         const instagram_url = document.getElementById('instagramUrl').value;
         const tiktok_url = document.getElementById('tiktokUrl').value;
         const youtube_url = document.getElementById('youtubeUrl').value;
         
         const { data: existing } = await supabaseClient.from('site_settings').select('id').limit(1);
         if (existing && existing[0]) {
-            await supabaseClient.from('site_settings').update({ site_name, access_code, footer_text, instagram_url, tiktok_url, youtube_url }).eq('id', existing[0].id);
+            await supabaseClient.from('site_settings').update({ 
+                site_name, site_subtitle, access_code, footer_text, creator_name,
+                instagram_url, tiktok_url, youtube_url, updated_at: new Date()
+            }).eq('id', existing[0].id);
         } else {
-            await supabaseClient.from('site_settings').insert([{ site_name, access_code, footer_text, instagram_url, tiktok_url, youtube_url }]);
+            await supabaseClient.from('site_settings').insert([{ 
+                site_name, site_subtitle, access_code, footer_text, creator_name,
+                instagram_url, tiktok_url, youtube_url
+            }]);
         }
         showAlert('✅ Parametrlər yadda saxlandı!');
     }
 
-    document.getElementById('logoFile')?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const fileName = `logo_${Date.now()}.jpg`;
-        await supabaseClient.storage.from('logos').upload(fileName, file);
-        const { data: existing } = await supabaseClient.from('site_settings').select('id').limit(1);
-        if (existing && existing[0]) await supabaseClient.from('site_settings').update({ logo_path: fileName }).eq('id', existing[0].id);
-        else await supabaseClient.from('site_settings').insert([{ logo_path: fileName }]);
-        loadSettings();
-        showAlert('✅ Loqo yükləndi!');
-    });
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
 
     async function loadLevels() {
         const { data } = await supabaseClient.from('levels').select('*').order('display_order');
         levels = data || [];
         const container = document.getElementById('levelsList');
         if (levels.length === 0) { container.innerHTML = '<p>Heç bir səviyyə yoxdur</p>'; return; }
-        container.innerHTML = `<table><thead><tr><th>ID</th><th>Ad</th><th>Sıra</th><th>Əməliyyat</th></tr></thead><tbody>${levels.map(l => `<tr><td>${l.id}</td><td>${escape(l.name)}</td><td>${l.display_order || 0}</td><td class="action-icons"><i class="fas fa-edit" onclick="editLevel(${l.id}, '${escape(l.name)}', ${l.display_order || 0})"></i> <i class="fas fa-trash" onclick="deleteLevel(${l.id})"></i></td></tr>`).join('')}</tbody></table>`;
+        container.innerHTML = `<table><thead><tr><th>ID</th><th>Ad</th><th>Sıra</th><th>Əməliyyat</th></tr></thead><tbody>${levels.map(l => `<tr><td>${l.id}</td><td>${escapeHtml(l.name)}</td><td>${l.display_order || 0}</td><td class="action-icons"><i class="fas fa-edit" onclick="editLevel(${l.id}, '${escapeHtml(l.name)}', ${l.display_order || 0})"></i> <i class="fas fa-trash" onclick="deleteLevel(${l.id})"></i></td></tr>`).join('')}</tbody></table>`;
+        
         const select = document.getElementById('wordLevel');
-        if (select) select.innerHTML = '<option value="">Seçin</option>' + levels.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+        if (select) select.innerHTML = '<option value="">Seçin</option>' + levels.map(l => `<option value="${escapeHtml(l.name)}">${escapeHtml(l.name)}</option>`).join('');
     }
 
     async function addLevel() {
         const name = document.getElementById('newLevel').value.trim();
-        if (!name) return;
+        if (!name) { showAlert('Səviyyə adı daxil edin!', true); return; }
         await supabaseClient.from('levels').insert([{ name, display_order: levels.length + 1 }]);
         document.getElementById('newLevel').value = '';
         loadLevels();
@@ -488,35 +492,41 @@
         showAlert('✅ Səviyyə silindi!');
     }
 
+    document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
+
     async function loadCategories() {
-        const { data } = await supabaseClient.from('words').select('category').not('category', 'is', null);
-        const unique = [...new Set(data.map(w => w.category).filter(c => c))];
-        categories = unique.sort();
+        const { data } = await supabaseClient.from('categories').select('*').order('display_order');
+        categories = data || [];
         const container = document.getElementById('categoriesList');
         if (categories.length === 0) { container.innerHTML = '<p>Heç bir kateqoriya yoxdur</p>'; return; }
-        container.innerHTML = `<table><thead><tr><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead><tbody>${categories.map(c => `<tr><td>${escape(c)}</td><td class="action-icons"><i class="fas fa-edit" onclick="editCategory('${escape(c)}')"></i> <i class="fas fa-trash" onclick="deleteCategory('${escape(c)}')"></i></td></tr>`).join('')}</tbody></table>`;
+        container.innerHTML = `<table><thead><tr><th>ID</th><th>Ad</th><th>Sıra</th><th>Əməliyyat</th></tr></thead><tbody>${categories.map(c => `<tr><td>${c.id}</td><td>${escapeHtml(c.name)}</td><td>${c.display_order || 0}</td><td class="action-icons"><i class="fas fa-edit" onclick="editCategory(${c.id}, '${escapeHtml(c.name)}')"></i> <i class="fas fa-trash" onclick="deleteCategory(${c.id}, '${escapeHtml(c.name)}')"></i></td></tr>`).join('')}</tbody></table>`;
+        
         const select = document.getElementById('wordCategory');
-        if (select) select.innerHTML = '<option value="">Seçin</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (select) select.innerHTML = '<option value="">Seçin</option>' + categories.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
     }
 
     async function addCategory() {
         const name = document.getElementById('newCategory').value.trim();
-        if (!name) return;
+        if (!name) { showAlert('Kateqoriya adı daxil edin!', true); return; }
+        await supabaseClient.from('categories').insert([{ name, display_order: categories.length + 1 }]);
         document.getElementById('newCategory').value = '';
         loadCategories();
         showAlert('✅ Kateqoriya əlavə edildi!');
     }
 
-    async function deleteCategory(cat) {
-        if (!confirm(`"${cat}" kateqoriyasını silmək?`)) return;
-        await supabaseClient.from('words').update({ category: null }).eq('category', cat);
+    async function deleteCategory(id, name) {
+        if (!confirm(`"${name}" kateqoriyasını silmək?`)) return;
+        await supabaseClient.from('categories').delete().eq('id', id);
+        await supabaseClient.from('words').update({ category_id: null, category: null }).eq('category_id', id);
         loadCategories();
         loadWords();
         showAlert('✅ Kateqoriya silindi!');
     }
 
+    document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
+
     async function loadWords(search = '') {
-        let query = supabaseClient.from('words').select('*').order('created_at', { ascending: false });
+        let query = supabaseClient.from('words').select('*, categories(name)').order('created_at', { ascending: false });
         if (search) query = query.ilike('az', `%${search}%`);
         const { data } = await query;
         words = data || [];
@@ -528,7 +538,7 @@
         const pageWords = words.slice(start, start + wordsPerPage);
         const container = document.getElementById('wordsList');
         if (pageWords.length === 0) { container.innerHTML = '<p>Heç bir söz yoxdur</p>'; renderPagination(0); return; }
-        container.innerHTML = `<table><thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead><tbody>${pageWords.map(w => `<tr><td>${w.id}</td><td>${escape(w.az)}</td><td>${escape(w.en)}</td><td>${escape(w.level || '-')}</td><td>${escape(w.category || '-')}</td><td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>`).join('')}</tbody></table>`;
+        container.innerHTML = `<table><thead><tr><th>ID</th><th>Azərbaycanca</th><th>İngiliscə</th><th>Səviyyə</th><th>Kateqoriya</th><th>Əməliyyat</th></tr></thead><tbody>${pageWords.map(w => `<tr><td>${w.id}</td><td>${escapeHtml(w.az)}</td><td>${escapeHtml(w.en)}</td><td>${escapeHtml(w.level || '-')}</td><td>${escapeHtml(w.categories?.name || w.category || '-')}</td><td class="action-icons"><i class="fas fa-edit" onclick="editWord(${w.id})"></i> <i class="fas fa-trash" onclick="deleteWord(${w.id})"></i></td></tr>`).join('')}</tbody></table>`;
         renderPagination(words.length);
     }
 
@@ -550,17 +560,25 @@
         const en = document.getElementById('wordEn').value.trim();
         if (!az || !en) { showAlert('Azərbaycanca və İngiliscə daxil edin!', true); return; }
         
+        const selectedCategory = document.getElementById('wordCategory').value;
+        let categoryId = null;
+        if (selectedCategory) {
+            const cat = categories.find(c => c.name === selectedCategory);
+            categoryId = cat ? cat.id : null;
+        }
+        
         await supabaseClient.from('words').insert([{
-            az, en, en_read: document.getElementById('wordEnRead').value.trim() || en.toLowerCase(),
+            az, en, 
+            en_read: document.getElementById('wordEnRead').value.trim() || en.toLowerCase(),
             level: document.getElementById('wordLevel').value || null,
-            category: document.getElementById('wordCategory').value || null,
+            category_id: categoryId,
+            category: selectedCategory || null,
             created_at: new Date()
         }]);
         document.getElementById('wordAz').value = '';
         document.getElementById('wordEn').value = '';
         document.getElementById('wordEnRead').value = '';
         loadWords();
-        loadCategories();
         showAlert('✅ Söz əlavə edildi!');
     }
 
@@ -568,73 +586,74 @@
         if (!confirm('Silmək?')) return;
         await supabaseClient.from('words').delete().eq('id', id);
         loadWords();
-        loadCategories();
         showAlert('✅ Söz silindi!');
     }
 
-    // Redaktə - BÜTÜN DİLLƏR İLƏ
+    document.getElementById('addWordBtn')?.addEventListener('click', addWord);
+    document.getElementById('searchWord')?.addEventListener('input', (e) => { currentWordPage = 1; loadWords(e.target.value); });
+
     window.editWord = async (id) => {
-        const word = words.find(w => w.id === id);
-        if (!word) return;
-        
-        // Digər dillərdə tərcümələri yüklə (əgər yoxdursa boş)
         const { data: fullWord } = await supabaseClient.from('words').select('*').eq('id', id).single();
+        if (!fullWord) return;
         
         editType = 'word'; editId = id;
         document.getElementById('modalTitle').innerText = 'Sözü Redaktə Et (Bütün dillər)';
         document.getElementById('modalBody').innerHTML = `
             <div class="grid-2">
-                <div class="form-group"><label>Azərbaycanca</label><input type="text" id="editAz" value="${escape(fullWord.az)}"></div>
-                <div class="form-group"><label>İngiliscə</label><input type="text" id="editEn" value="${escape(fullWord.en)}"></div>
+                <div class="form-group"><label>Azərbaycanca</label><input type="text" id="editAz" value="${escapeHtml(fullWord.az)}"></div>
+                <div class="form-group"><label>İngiliscə</label><input type="text" id="editEn" value="${escapeHtml(fullWord.en)}"></div>
             </div>
-            <div class="form-group"><label>Oxunuş (İng)</label><input type="text" id="editEnRead" value="${escape(fullWord.en_read || '')}"></div>
+            <div class="form-group"><label>Oxunuş (İng)</label><input type="text" id="editEnRead" value="${escapeHtml(fullWord.en_read || '')}"></div>
             <div class="grid-2">
-                <div class="form-group"><label>Səviyyə</label><select id="editLevel">${levels.map(l => `<option value="${l.name}" ${fullWord.level === l.name ? 'selected' : ''}>${l.name}</option>`).join('')}</select></div>
-                <div class="form-group"><label>Kateqoriya</label><select id="editCategory"><option value="">Seçilməyib</option>${categories.map(c => `<option value="${c}" ${fullWord.category === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+                <div class="form-group"><label>Səviyyə</label><select id="editLevel">${levels.map(l => `<option value="${escapeHtml(l.name)}" ${fullWord.level === l.name ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}</select></div>
+                <div class="form-group"><label>Kateqoriya</label><select id="editCategory"><option value="">Seçilməyib</option>${categories.map(c => `<option value="${escapeHtml(c.name)}" ${fullWord.category === c.name ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}</select></div>
             </div>
-            <hr style="margin: 15px 0;">
+            <hr>
             <h4>🇷🇺 Rusca</h4>
-            <div class="grid-2">
-                <div class="form-group"><input type="text" id="editRu" placeholder="Rusca tərcümə" value="${escape(fullWord.ru || '')}"></div>
-                <div class="form-group"><input type="text" id="editRuRead" placeholder="Oxunuş" value="${escape(fullWord.ru_read || '')}"></div>
-            </div>
+            <div class="grid-2"><div class="form-group"><input type="text" id="editRu" placeholder="Rusca tərcümə" value="${escapeHtml(fullWord.ru || '')}"></div><div class="form-group"><input type="text" id="editRuRead" placeholder="Oxunuş" value="${escapeHtml(fullWord.ru_read || '')}"></div></div>
             <h4>🇩🇪 Almanca</h4>
-            <div class="grid-2">
-                <div class="form-group"><input type="text" id="editDe" placeholder="Almanca tərcümə" value="${escape(fullWord.de || '')}"></div>
-                <div class="form-group"><input type="text" id="editDeRead" placeholder="Oxunuş" value="${escape(fullWord.de_read || '')}"></div>
-            </div>
+            <div class="grid-2"><div class="form-group"><input type="text" id="editDe" placeholder="Almanca tərcümə" value="${escapeHtml(fullWord.de || '')}"></div><div class="form-group"><input type="text" id="editDeRead" placeholder="Oxunuş" value="${escapeHtml(fullWord.de_read || '')}"></div></div>
             <h4>🇪🇸 İspanca</h4>
-            <div class="grid-2">
-                <div class="form-group"><input type="text" id="editEs" placeholder="İspanca tərcümə" value="${escape(fullWord.es || '')}"></div>
-                <div class="form-group"><input type="text" id="editEsRead" placeholder="Oxunuş" value="${escape(fullWord.es_read || '')}"></div>
-            </div>
+            <div class="grid-2"><div class="form-group"><input type="text" id="editEs" placeholder="İspanca tərcümə" value="${escapeHtml(fullWord.es || '')}"></div><div class="form-group"><input type="text" id="editEsRead" placeholder="Oxunuş" value="${escapeHtml(fullWord.es_read || '')}"></div></div>
             <h4>🇵🇹 Portuqalca</h4>
-            <div class="grid-2">
-                <div class="form-group"><input type="text" id="editPt" placeholder="Portuqalca tərcümə" value="${escape(fullWord.pt || '')}"></div>
-                <div class="form-group"><input type="text" id="editPtRead" placeholder="Oxunuş" value="${escape(fullWord.pt_read || '')}"></div>
-            </div>
+            <div class="grid-2"><div class="form-group"><input type="text" id="editPt" placeholder="Portuqalca tərcümə" value="${escapeHtml(fullWord.pt || '')}"></div><div class="form-group"><input type="text" id="editPtRead" placeholder="Oxunuş" value="${escapeHtml(fullWord.pt_read || '')}"></div></div>
             <h4>🇹🇷 Türkcə</h4>
-            <div class="grid-2">
-                <div class="form-group"><input type="text" id="editTr" placeholder="Türkcə tərcümə" value="${escape(fullWord.tr || '')}"></div>
-                <div class="form-group"><input type="text" id="editTrRead" placeholder="Oxunuş" value="${escape(fullWord.tr_read || '')}"></div>
-            </div>
+            <div class="grid-2"><div class="form-group"><input type="text" id="editTr" placeholder="Türkcə tərcümə" value="${escapeHtml(fullWord.tr || '')}"></div><div class="form-group"><input type="text" id="editTrRead" placeholder="Oxunuş" value="${escapeHtml(fullWord.tr_read || '')}"></div></div>
             <h4>🇨🇳 Çincə</h4>
-            <div class="grid-2">
-                <div class="form-group"><input type="text" id="editZh" placeholder="Çincə tərcümə" value="${escape(fullWord.zh || '')}"></div>
-                <div class="form-group"><input type="text" id="editZhRead" placeholder="Oxunuş" value="${escape(fullWord.zh_read || '')}"></div>
-            </div>
+            <div class="grid-2"><div class="form-group"><input type="text" id="editZh" placeholder="Çincə tərcümə" value="${escapeHtml(fullWord.zh || '')}"></div><div class="form-group"><input type="text" id="editZhRead" placeholder="Oxunuş" value="${escapeHtml(fullWord.zh_read || '')}"></div></div>
         `;
+        document.getElementById('editModal').classList.add('active');
+    };
+
+    window.editLevel = (id, name, order) => {
+        editType = 'level'; editId = id;
+        document.getElementById('modalTitle').innerText = 'Səviyyəni Redaktə Et';
+        document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Ad</label><input type="text" id="editName" value="${escapeHtml(name)}"></div><div class="form-group"><label>Sıra</label><input type="number" id="editOrder" value="${order}"></div>`;
+        document.getElementById('editModal').classList.add('active');
+    };
+
+    window.editCategory = (id, name) => {
+        editType = 'category'; editId = id;
+        document.getElementById('modalTitle').innerText = 'Kateqoriyanı Redaktə Et';
+        document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Yeni ad</label><input type="text" id="editName" value="${escapeHtml(name)}"></div><div class="form-group"><label>Sıra</label><input type="number" id="editOrder" value="0"></div>`;
         document.getElementById('editModal').classList.add('active');
     };
 
     document.getElementById('saveEditBtn').onclick = async () => {
         if (editType === 'word') {
+            const selectedCategory = document.getElementById('editCategory').value;
+            let categoryId = null;
+            if (selectedCategory) {
+                const cat = categories.find(c => c.name === selectedCategory);
+                categoryId = cat ? cat.id : null;
+            }
             await supabaseClient.from('words').update({
                 az: document.getElementById('editAz').value,
                 en: document.getElementById('editEn').value,
                 en_read: document.getElementById('editEnRead').value,
                 level: document.getElementById('editLevel').value,
-                category: document.getElementById('editCategory').value,
+                category_id: categoryId,
+                category: selectedCategory || null,
                 ru: document.getElementById('editRu').value || null,
                 ru_read: document.getElementById('editRuRead').value || null,
                 de: document.getElementById('editDe').value || null,
@@ -646,41 +665,27 @@
                 tr: document.getElementById('editTr').value || null,
                 tr_read: document.getElementById('editTrRead').value || null,
                 zh: document.getElementById('editZh').value || null,
-                zh_read: document.getElementById('editZhRead').value || null
+                zh_read: document.getElementById('editZhRead').value || null,
+                updated_at: new Date()
             }).eq('id', editId);
             loadWords();
             showAlert('✅ Söz yeniləndi!');
         } else if (editType === 'level') {
             await supabaseClient.from('levels').update({ name: document.getElementById('editName').value, display_order: parseInt(document.getElementById('editOrder').value) }).eq('id', editId);
             loadLevels();
+            showAlert('✅ Səviyyə yeniləndi!');
         } else if (editType === 'category') {
-            const newName = document.getElementById('editName').value;
-            if (editId !== newName) await supabaseClient.from('words').update({ category: newName }).eq('category', editId);
+            await supabaseClient.from('categories').update({ name: document.getElementById('editName').value, display_order: parseInt(document.getElementById('editOrder').value) }).eq('id', editId);
             loadCategories();
-            loadWords();
+            showAlert('✅ Kateqoriya yeniləndi!');
         }
         document.getElementById('editModal').classList.remove('active');
     };
 
-    window.editLevel = (id, name, order) => {
-        editType = 'level'; editId = id;
-        document.getElementById('modalTitle').innerText = 'Səviyyəni Redaktə Et';
-        document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Ad</label><input type="text" id="editName" value="${escape(name)}"></div><div class="form-group"><label>Sıra</label><input type="number" id="editOrder" value="${order}"></div>`;
-        document.getElementById('editModal').classList.add('active');
-    };
-
-    window.editCategory = (name) => {
-        editType = 'category'; editId = name;
-        document.getElementById('modalTitle').innerText = 'Kateqoriyanı Redaktə Et';
-        document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Yeni ad</label><input type="text" id="editName" value="${escape(name)}"></div>`;
-        document.getElementById('editModal').classList.add('active');
-    };
-
     document.getElementById('closeModalBtn').onclick = () => document.getElementById('editModal').classList.remove('active');
 
-    function escape(str) { return String(str || '').replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function escapeHtml(str) { return String(str || '').replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // Tab keçid
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -690,14 +695,6 @@
         });
     });
 
-    // Event listeners
-    document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
-    document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
-    document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
-    document.getElementById('addWordBtn')?.addEventListener('click', addWord);
-    document.getElementById('searchWord')?.addEventListener('input', (e) => { currentWordPage = 1; loadWords(e.target.value); });
-
-    // Dark mode
     let dark = localStorage.getItem('adminDark') === 'true';
     if (dark) document.body.classList.add('dark');
     document.getElementById('themeToggle').onclick = () => {
@@ -708,7 +705,6 @@
     async function start() {
         await checkDBConnection();
         await checkAccessCode();
-        if (!isLoggedIn) document.getElementById('loginOverlay').classList.remove('hidden');
     }
     start();
 </script>

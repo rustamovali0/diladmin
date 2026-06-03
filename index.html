@@ -613,4 +613,38 @@
         setTimeout(() => { el.style.display = 'none'; }, 3000);
     }
 
-    function escapeHtml(str) { return String(str
+     function escapeHtml(str) { 
+        return String(str || '').replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
+    }
+
+    // Event Listeners
+    document.getElementById('addWordBtn')?.addEventListener('click', addWord);
+    document.getElementById('addLevelBtn')?.addEventListener('click', addLevel);
+    document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => document.getElementById('editModal').classList.remove('active'));
+    searchInput?.addEventListener('input', (e) => { currentPage = 1; loadWords(e.target.value); });
+
+    // Tab keçid
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+        });
+    });
+
+    // Dark mode
+    let dark = localStorage.getItem('adminDark') === 'true';
+    if (dark) document.body.classList.add('dark');
+    document.getElementById('themeToggle').onclick = () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('adminDark', document.body.classList.contains('dark'));
+    };
+
+    // Başlat
+    checkAccessCode();
+</script>
+</body>
+</html>
